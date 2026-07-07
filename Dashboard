@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BYINFORGH — Command Centre (LIVE DEMO)</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--black:#0a0a0a;--surface:#111111;--card:#181818;--border:#2a2a2a;--gold:#f5c842;--gold-dim:#c8a22a;--green:#22c55e;--red:#ef4444;--orange:#f97316;--blue:#3b82f6;--purple:#a855f7;--teal:#14b8a6;--muted:#888;--text:#f2f2f2;--text-dim:#b5b5b5;}
+*{margin:0;padding:0;box-sizing:border-box;}body{background:var(--black);color:var(--text);font-family:'Syne',sans-serif;min-height:100vh;}
+.demo-flag{background:var(--teal);color:#0a0a0a;text-align:center;font-family:'Syne',sans-serif;font-weight:800;font-size:12px;letter-spacing:2px;padding:6px;}
+.header{background:var(--surface);border-bottom:1px solid var(--border);padding:16px 24px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
+.logo{font-size:20px;font-weight:800;letter-spacing:2px;color:var(--gold);}.logo span{color:var(--text-dim);font-weight:400;font-size:12px;display:block;letter-spacing:3px;}
+.header-right{display:flex;align-items:center;gap:16px;}
+.live-dot{width:8px;height:8px;background:var(--green);border-radius:50%;animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(1.4)}}
+.last-refresh{font-size:11px;color:var(--muted);font-family:'Space Mono',monospace;}
+.refresh-btn{background:var(--border);border:none;color:var(--text);padding:6px 14px;border-radius:4px;cursor:pointer;font-size:12px;font-family:'Syne',sans-serif;font-weight:600;letter-spacing:1px;transition:background .2s;}
+.refresh-btn:hover{background:var(--gold);color:var(--black);}
+.main{padding:20px 24px;max-width:1400px;margin:0 auto;}
+.tabs{display:flex;gap:4px;margin-bottom:24px;background:var(--surface);padding:6px;border-radius:8px;border:1px solid var(--border);overflow-x:auto;}
+.tab{padding:8px 16px;border-radius:5px;cursor:pointer;font-size:12px;font-weight:700;letter-spacing:1px;white-space:nowrap;color:var(--text-dim);transition:all .2s;border:none;background:none;font-family:'Syne',sans-serif;}
+.tab.active{background:var(--gold);color:var(--black);}.tab:hover:not(.active){color:var(--text);background:var(--border);}
+.tab-content{display:none;}.tab-content.active{display:block;}
+.metrics-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:24px;}
+.metric-card{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:18px;position:relative;overflow:hidden;}
+.metric-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;}
+.metric-card.gold::before{background:var(--gold);}.metric-card.green::before{background:var(--green);}.metric-card.red::before{background:var(--red);}.metric-card.blue::before{background:var(--blue);}.metric-card.orange::before{background:var(--orange);}.metric-card.teal::before{background:var(--teal);}
+.metric-label{font-size:10px;font-weight:700;letter-spacing:2px;color:var(--muted);margin-bottom:8px;}
+.metric-value{font-size:32px;font-weight:800;font-family:'Space Mono',monospace;line-height:1;}
+.metric-sub{font-size:11px;color:var(--text-dim);margin-top:6px;}
+.metric-card.gold .metric-value{color:var(--gold);}.metric-card.green .metric-value{color:var(--green);}.metric-card.red .metric-value{color:var(--red);}.metric-card.blue .metric-value{color:var(--blue);}.metric-card.orange .metric-value{color:var(--orange);}.metric-card.teal .metric-value{color:var(--teal);}
+.target-bar-wrap{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:18px;margin-bottom:24px;}
+.progress-track{background:var(--border);border-radius:4px;height:8px;overflow:hidden;margin-bottom:8px;}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--gold),var(--orange));border-radius:4px;transition:width 1s ease;}
+.section-title{font-size:11px;font-weight:700;letter-spacing:3px;color:var(--muted);margin-bottom:12px;text-transform:uppercase;}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px;}@media(max-width:768px){.two-col{grid-template-columns:1fr;}}
+.card{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:18px;margin-bottom:16px;}
+.wa-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;}
+.wa-item{background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:12px;display:flex;align-items:center;gap:10px;}
+.wa-emoji{font-size:20px;}.wa-count{font-size:22px;font-weight:800;font-family:'Space Mono',monospace;}.wa-label{font-size:10px;color:var(--text-dim);margin-top:2px;}
+.contact-table{width:100%;border-collapse:collapse;font-size:12px;}
+.contact-table th{text-align:left;padding:8px 10px;color:var(--muted);font-weight:700;letter-spacing:1px;border-bottom:1px solid var(--border);font-size:10px;}
+.contact-table td{padding:8px 10px;border-bottom:1px solid #1a1a1a;vertical-align:middle;line-height:1.3;}
+.contact-table tr:hover td{background:#1c1c1c;}
+.stage-badge{display:inline-block;padding:2px 8px;border-radius:3px;font-size:10px;font-weight:700;letter-spacing:1px;}
+.stage-hot{background:#2a1500;color:#f97316;border:1px solid #f97316;}.stage-conv{background:#001a20;color:#22d3ee;border:1px solid #22d3ee;}
+.stage-cold{background:#1a1a1a;color:#666;border:1px solid #333;}.stage-client{background:#001a00;color:#22c55e;border:1px solid #22c55e;}
+.pipeline-stage{background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:14px;text-align:center;}
+.pipeline-count{font-size:28px;font-weight:800;font-family:'Space Mono',monospace;color:var(--gold);}.pipeline-name{font-size:11px;color:var(--text-dim);margin-top:4px;font-weight:700;letter-spacing:1px;}
+.followup-item{background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:14px;margin-bottom:12px;}
+.followup-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;}
+.followup-name{font-size:13px;font-weight:700;}.followup-meta{font-size:10px;color:var(--text-dim);margin-top:2px;}
+.new-badge{display:inline-block;background:var(--green);color:#000;font-size:9px;font-weight:800;padding:2px 6px;border-radius:3px;margin-left:6px;letter-spacing:1px;animation:flashnew 1.5s ease-in-out 3;}
+@keyframes flashnew{0%,100%{opacity:1}50%{opacity:.4}}
+.client-item{background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:14px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;gap:12px;}
+.client-name{font-size:13px;font-weight:700;}.client-pkg{font-size:11px;color:var(--text-dim);}.client-amount{font-size:18px;font-weight:800;font-family:'Space Mono',monospace;color:var(--gold);}
+.active-tag{color:var(--green);font-weight:700;}
+.empty{text-align:center;padding:30px;color:var(--muted);font-size:12px;}
+.loading{text-align:center;padding:40px;color:var(--muted);font-size:13px;font-family:'Space Mono',monospace;}
+.toast{position:fixed;bottom:24px;right:24px;background:var(--gold);color:var(--black);padding:10px 18px;border-radius:6px;font-size:12px;font-weight:700;letter-spacing:1px;opacity:0;transform:translateY(20px);transition:all .3s;z-index:999;pointer-events:none;}
+.toast.show{opacity:1;transform:translateY(0);}
+select{background:var(--surface);border:1px solid var(--border);color:var(--text);padding:6px 10px;border-radius:5px;font-family:'Syne',sans-serif;font-size:11px;outline:none;}
+</style>
+</head>
+<body>
+<div class="demo-flag">⚡ LIVE DEMO — THE DIGITAL PRESENCE &amp; CUSTOMER SYSTEM © BYINFORGH — reads live from the demo Google Sheet, refreshes automatically</div>
+<div class="header">
+  <div class="logo">BYINFORGH <span>COMMAND CENTRE — DEMO</span></div>
+  <div class="header-right"><div class="live-dot"></div><span class="last-refresh" id="lastRefresh">Loading...</span><button class="refresh-btn" onclick="loadData()">&#8635; REFRESH</button></div>
+</div>
+<div class="main">
+<div class="tabs">
+  <button class="tab active" onclick="switchTab('today',event)">TODAY</button>
+  <button class="tab" onclick="switchTab('followup',event)">FOLLOW-UPS</button>
+  <button class="tab" onclick="switchTab('pipeline',event)">PIPELINE</button>
+  <button class="tab" onclick="switchTab('clients',event)">CLIENTS</button>
+  <button class="tab" onclick="switchTab('revenue',event)">REVENUE</button>
+</div>
+
+<div class="tab-content active" id="tab-today">
+  <div class="metrics-grid" id="topMetrics"><div class="loading">Loading data</div></div>
+  <div class="target-bar-wrap" id="targetBar"></div>
+  <div class="two-col">
+    <div><div class="section-title">&#128293; ACTION REQUIRED TODAY</div><div id="todayActions"></div></div>
+    <div><div class="section-title">&#128202; WA BOARD</div><div class="wa-grid" id="waBoard"></div></div>
+  </div>
+  <div class="section-title">&#127919; MOST RECENT ACTIVITY</div>
+  <div id="recentActivity"></div>
+</div>
+
+<div class="tab-content" id="tab-followup">
+  <div style="background:#0a1a0a;border:1px solid #1a3a1a;border-radius:6px;padding:10px 14px;margin-bottom:14px;font-size:11px;color:#4a8a4a;line-height:1.6">
+    <strong>SHOWING:</strong> Contacts due today or overdue, hottest first. Change WA Label / Stage inline — it saves straight back to the sheet.
+  </div>
+  <div id="followupList"></div>
+</div>
+
+<div class="tab-content" id="tab-pipeline">
+  <div class="section-title">PIPELINE BY STAGE</div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px;margin-bottom:20px" id="pipelineGrid"></div>
+  <div class="section-title">ALL CONTACTS</div>
+  <div style="overflow-x:auto"><table class="contact-table"><thead><tr><th>BUSINESS</th><th>NUMBER</th><th>CATEGORY</th><th>STAGE</th><th>WA</th><th>NEXT FOLLOW-UP</th></tr></thead><tbody id="pipelineBody"></tbody></table></div>
+</div>
+
+<div class="tab-content" id="tab-clients">
+  <div class="section-title">ACTIVE CLIENTS</div>
+  <div id="clientsList"></div>
+  <div class="section-title" style="margin-top:20px">SME SYSTEMS MEMBERS</div>
+  <div id="smeList"></div>
+</div>
+
+<div class="tab-content" id="tab-revenue">
+  <div class="metrics-grid" id="revenueMetrics"></div>
+  <div class="section-title">RECENT CONVERSIONS</div>
+  <div id="conversionsList"></div>
+</div>
+
+</div>
+<div class="toast" id="toast"></div>
+<script>
+// ============================================================
+// PASTE YOUR APPS SCRIPT WEB APP URL HERE (ends in /exec)
+// ============================================================
+const API_URL = "https://script.google.com/macros/s/AKfycbwNsvuFocgeZR8x029VYkmWydE8py3ceSGxfqpnk_7gkkN_mndCvGnluLSmOcKBIkjeVQ/exec";
+let state = { contacts:[], clients:[], smeMembers:[], raw:{} };
+let knownIds = new Set();
+let firstLoad = true;
+
+function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500);}
+function switchTab(name,evt){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
+  if(evt) evt.target.classList.add('active');
+  document.getElementById('tab-'+name).classList.add('active');
+  if(name==='followup')renderFollowUps();
+  if(name==='pipeline')renderPipeline();
+  if(name==='clients')renderClients();
+  if(name==='revenue')renderRevenue();
+}
+function getWAEmoji(label){if(!label)return'';if(label.includes('🔴'))return'🔴';if(label.includes('🟡'))return'🟡';if(label.includes('🟠'))return'🟠';if(label.includes('🟢'))return'🟢';if(label.includes('🔵'))return'🔵';if(label.includes('✅'))return'✅';if(label.includes('⬛'))return'⬛';return'';}
+function countByLabel(emoji){return state.contacts.filter(c=>c.WA_Label&&c.WA_Label.includes(emoji)).length;}
+function getColorForLabel(e){const m={'🔴':'#ef4444','🟡':'#eab308','🟠':'#f97316','🟢':'#22c55e','🔵':'#3b82f6','✅':'#22c55e','⬛':'#555'};return m[e]||'#999';}
+function getStageBadge(stage){if(!stage)return'stage-cold';const s=stage.toLowerCase();if(s.includes('hot')||s.includes('proposal'))return'stage-hot';if(s.includes('conv'))return'stage-conv';if(s.includes('client'))return'stage-client';return'stage-cold';}
+function cleanDate(str){if(!str)return'—';if(/^\d{2}\/\d{2}\/\d{4}$/.test(str))return str;return str;}
+function parseFollowUpDate(str){if(!str)return null;const p=str.split('/');if(p.length===3&&p[2].length===4){const d=new Date(parseInt(p[2]),parseInt(p[1])-1,parseInt(p[0]));if(!isNaN(d.getTime()))return d;}return null;}
+
+async function loadData(){
+  document.getElementById('lastRefresh').textContent='Refreshing...';
+  try{
+    const res=await fetch(API_URL+'?t='+Date.now());
+    const raw=await res.json();
+    if(raw.fatalError)throw new Error(raw.fatalError);
+    state.raw=raw;
+    state.contacts=(raw.allContacts||raw.masterCRM||[]).filter(c=>c.Business);
+    state.clients=raw.clients||[];
+    state.smeMembers=raw.smeMembers||[];
+    document.getElementById('lastRefresh').textContent='Updated: '+new Date().toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+    if(!firstLoad){
+      const newOnes=state.contacts.filter(c=>c.ID&&!knownIds.has(c.ID));
+      if(newOnes.length>0)showToast('⚡ New lead just landed: '+newOnes[0].Business);
+    }
+    state.contacts.forEach(c=>{if(c.ID)knownIds.add(c.ID);});
+    firstLoad=false;
+    renderToday();
+    const activeTab=document.querySelector('.tab.active').textContent.trim().toLowerCase();
+    if(activeTab==='follow-ups')renderFollowUps();
+    if(activeTab==='pipeline')renderPipeline();
+    if(activeTab==='clients')renderClients();
+    if(activeTab==='revenue')renderRevenue();
+  }catch(e){
+    document.getElementById('lastRefresh').textContent='Offline — check API_URL is set';
+    console.log('Load error:',e.message);
+  }
+}
+
+function getMRR(){
+  const vis=state.clients.filter(c=>(c.Status||'').toLowerCase()==='active').reduce((s,c)=>s+(parseFloat(c.Amount)||0),0);
+  const sme=state.smeMembers.filter(m=>(m.Status||'').toLowerCase()==='active').reduce((s,m)=>s+(parseFloat(m.Amount)||0),0);
+  return vis+sme;
+}
+
+function renderToday(){
+  const total=state.contacts.length;
+  const mrr=getMRR();
+  const hot=countByLabel('🔵'), conv=countByLabel('🟢'), red=countByLabel('🔴');
+  const todayOut=state.raw.todayOutreachCount||0;
+  document.getElementById('topMetrics').innerHTML=`
+    <div class="metric-card gold"><div class="metric-label">TOTAL MRR</div><div class="metric-value">&#8373;${mrr}</div><div class="metric-sub">visibility + SME systems</div></div>
+    <div class="metric-card green"><div class="metric-label">TOTAL CONTACTS</div><div class="metric-value">${total}</div><div class="metric-sub">live in the pipeline</div></div>
+    <div class="metric-card orange"><div class="metric-label">HOT LEADS</div><div class="metric-value">${hot}</div><div class="metric-sub">verbal yes / proposal sent</div></div>
+    <div class="metric-card blue"><div class="metric-label">CONVERSATIONS</div><div class="metric-value">${conv}</div><div class="metric-sub">active this week</div></div>
+    <div class="metric-card red"><div class="metric-label">CALL LIST</div><div class="metric-value">${red}</div><div class="metric-sub">1-tick, call directly</div></div>
+    <div class="metric-card teal"><div class="metric-label">OUTREACH TODAY</div><div class="metric-value">${todayOut}</div><div class="metric-sub">logged today</div></div>`;
+  const mt=5400, pct=Math.min(100,Math.round((mrr/mt)*100));
+  document.getElementById('targetBar').innerHTML=`
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+      <div style="font-size:12px;font-weight:700;letter-spacing:2px;color:var(--muted)">REVENUE TARGET</div>
+      <div style="font-size:20px;font-weight:800;font-family:'Space Mono',monospace;color:var(--gold)">&#8373;${mrr} / &#8373;${mt.toLocaleString()}</div>
+    </div>
+    <div class="progress-track"><div class="progress-fill" style="width:${pct}%"></div></div>`;
+  const today=new Date();today.setHours(0,0,0,0);
+  const dueF=state.contacts.filter(c=>{const d=parseFollowUpDate(c.Next_Follow_Up);return d&&d<=today&&c.WA_Label&&!c.WA_Label.includes('⬛');});
+  const callC=state.contacts.filter(c=>c.WA_Label&&c.WA_Label.includes('🔴'));
+  document.getElementById('todayActions').innerHTML=`<div class="card">
+    <div style="padding:10px 0;border-bottom:1px solid #1a1a1a;font-size:13px">🔥 ${hot} hot lead${hot!==1?'s':''} ready to close — Follow-Ups tab</div>
+    <div style="padding:10px 0;border-bottom:1px solid #1a1a1a;font-size:13px">📋 ${dueF.length} contact${dueF.length!==1?'s':''} due for follow-up today</div>
+    <div style="padding:10px 0;font-size:13px">📞 ${callC.length} contact${callC.length!==1?'s':''} stuck on 1-tick — call directly</div>
+  </div>`;
+  const labels=[{e:'🔴',l:'1 Tick — call only'},{e:'🟡',l:'2 Tick unread'},{e:'🟠',l:'Read no reply'},{e:'🟢',l:'Conversation'},{e:'🔵',l:'Hot lead'},{e:'✅',l:'Client'}];
+  document.getElementById('waBoard').innerHTML=labels.map(l=>`<div class="wa-item"><div class="wa-emoji">${l.e}</div><div><div class="wa-count" style="color:${getColorForLabel(l.e)}">${countByLabel(l.e)}</div><div class="wa-label">${l.l}</div></div></div>`).join('');
+  const recent=[...state.contacts].sort((a,b)=>(b.Created_Date||'').localeCompare(a.Created_Date||'')).slice(0,5);
+  document.getElementById('recentActivity').innerHTML=recent.length?recent.map(c=>`<div class="followup-item"><div class="followup-name">${getWAEmoji(c.WA_Label)} ${c.Business}${c.Source&&c.Source.includes('Demo Landing')?'<span class="new-badge">NEW — FROM LANDING PAGE</span>':''}</div><div class="followup-meta">${c.Number||'—'} · ${c.Town||'—'} · ${c.Category||'—'} · Stage: ${c.Stage||'—'}</div></div>`).join(''):'<div class="empty">No contacts yet</div>';
+}
+
+function renderFollowUps(){
+  const today=new Date();today.setHours(0,0,0,0);
+  let contacts=state.contacts.filter(c=>c.Business&&c.WA_Label&&!c.WA_Label.includes('⬛')&&!c.WA_Label.includes('✅'));
+  contacts=contacts.filter(c=>{const d=parseFollowUpDate(c.Next_Follow_Up);return !d||d<=today;});
+  const order=c=>{const l=c.WA_Label||'';if(l.includes('🔵'))return 0;if(l.includes('🟢'))return 1;if(l.includes('🟠'))return 2;if(l.includes('🟡'))return 3;if(l.includes('🔴'))return 4;return 5;};
+  contacts.sort((a,b)=>order(a)-order(b));
+  if(!contacts.length){document.getElementById('followupList').innerHTML='<div class="empty">No contacts due today</div>';return;}
+  document.getElementById('followupList').innerHTML=contacts.map(c=>{
+    const sb=c.Business.replace(/'/g,"\\'");
+    return `<div class="followup-item">
+      <div class="followup-header"><div>
+        <div class="followup-name">${getWAEmoji(c.WA_Label)} ${c.Business}</div>
+        <div class="followup-meta">${c.Number||'—'} · ${c.Town||'—'} · ${c.Category||'—'} · Due: ${cleanDate(c.Next_Follow_Up)}</div>
+      </div>
+      <select onchange="updateContactField('${sb}','WA_Label',this.value)">
+        <option value="🔴 1 Tick message not delivered call only"${c.WA_Label==='🔴 1 Tick message not delivered call only'?' selected':''}>🔴 1-Tick</option>
+        <option value="🟡 2 Tick No Read Delivered, unread follow up in 3 days"${c.WA_Label==='🟡 2 Tick No Read Delivered, unread follow up in 3 days'?' selected':''}>🟡 Unread</option>
+        <option value="🟠 2 Tick Read Read, no reply re-enter with new value"${c.WA_Label==='🟠 2 Tick Read Read, no reply re-enter with new value'?' selected':''}>🟠 Read no reply</option>
+        <option value="🟢 Conversation Active close this week"${c.WA_Label==='🟢 Conversation Active close this week'?' selected':''}>🟢 Conversation</option>
+        <option value="🔵 Hot LeadVerbal yes / proposal sent"${c.WA_Label==='🔵 Hot LeadVerbal yes / proposal sent'?' selected':''}>🔵 Hot Lead</option>
+        <option value="✅ Client Paying">✅ Client (Closed!)</option>
+        <option value="⬛ Rejected Closed, no contact">⬛ Rejected</option>
+      </select>
+      </div>
+      <div class="followup-meta" style="margin-top:8px;color:var(--text-dim)">${c.Notes?c.Notes.substring(0,180):'No notes yet.'}</div>
+    </div>`;
+  }).join('');
+}
+
+async function updateContactField(business,field,value){
+  try{
+    const res=await fetch(API_URL+'?action=updateContactField&business='+encodeURIComponent(business)+'&field='+encodeURIComponent(field)+'&value='+encodeURIComponent(value)+'&t='+Date.now());
+    const data=await res.json();
+    if(data.success){
+      const c=state.contacts.find(x=>x.Business===business); if(c)c[field]=value;
+      showToast('✓ '+business+' updated');
+      renderToday();
+    }else showToast('Error: '+(data.error||'could not update'));
+  }catch(e){showToast('Connection error');}
+}
+
+function renderPipeline(){
+  const stages=[{n:'First Message',key:'first message'},{n:'Follow Up',key:'follow up'},{n:'Conversation',key:'conversation'},{n:'Interested',key:'interested'},{n:'Proposal Sent',key:'proposal'},{n:'Client',key:'client'},{n:'Not Interested',key:'not interested'}];
+  document.getElementById('pipelineGrid').innerHTML=stages.map(s=>{
+    const count=state.contacts.filter(c=>c.Stage&&c.Stage.toLowerCase().includes(s.key)).length;
+    return `<div class="pipeline-stage"><div class="pipeline-count">${count}</div><div class="pipeline-name">${s.n}</div></div>`;
+  }).join('');
+  document.getElementById('pipelineBody').innerHTML=state.contacts.map(c=>`<tr><td><strong>${c.Business}</strong></td><td style="font-family:'Space Mono',monospace;color:var(--gold)">${c.Number||'—'}</td><td>${c.Category||'—'}</td><td><span class="stage-badge ${getStageBadge(c.Stage)}">${c.Stage||'—'}</span></td><td style="font-size:16px">${getWAEmoji(c.WA_Label)}</td><td>${cleanDate(c.Next_Follow_Up)}</td></tr>`).join('')||'<tr><td colspan="6" style="text-align:center;padding:20px;color:var(--muted)">No contacts yet</td></tr>';
+}
+
+function renderClients(){
+  document.getElementById('clientsList').innerHTML=state.clients.map(c=>`<div class="client-item"><div><div class="client-name">${c.Business}</div><div class="client-pkg">${c.Package} · Joined ${c.Joined||'—'}</div></div><div style="text-align:right"><div class="client-amount">&#8373;${c.Amount||0}</div><div class="active-tag">${c.Status}</div></div></div>`).join('')||'<div class="empty">No clients yet</div>';
+  document.getElementById('smeList').innerHTML=state.smeMembers.map(m=>`<div class="client-item" style="border-color:var(--teal)"><div><div class="client-name">&#128295; ${m.Business}</div><div class="client-pkg">${m.Package||'—'}</div></div><div style="text-align:right"><div class="client-amount" style="color:var(--teal)">&#8373;${m.Amount||0}</div><div class="active-tag">${m.Status}</div></div></div>`).join('')||'<div class="empty">No SME members yet</div>';
+}
+
+async function renderRevenue(){
+  const mrr=getMRR();
+  document.getElementById('revenueMetrics').innerHTML=`
+    <div class="metric-card gold"><div class="metric-label">TOTAL MRR</div><div class="metric-value">&#8373;${mrr}</div><div class="metric-sub">visibility + SME</div></div>
+    <div class="metric-card green"><div class="metric-label">ACTIVE CLIENTS</div><div class="metric-value">${state.clients.filter(c=>(c.Status||'').toLowerCase()==='active').length}</div><div class="metric-sub">visibility packages</div></div>
+    <div class="metric-card teal"><div class="metric-label">SME MEMBERS</div><div class="metric-value">${state.smeMembers.filter(m=>(m.Status||'').toLowerCase()==='active').length}</div><div class="metric-sub">systems deployed</div></div>`;
+  try{
+    const res=await fetch(API_URL+'?action=getActivityLog&t='+Date.now());
+    const d=await res.json();
+    const conv=d.conversions||[];
+    document.getElementById('conversionsList').innerHTML=conv.length?conv.slice(0,10).map(c=>`<div class="followup-item"><div class="followup-name">&#127881; ${c.business}</div><div class="followup-meta">${c.offer||'—'} · ${c.date||''}</div></div><div style="text-align:right;margin-top:-40px;padding-right:14px;color:var(--gold);font-weight:800;font-family:'Space Mono',monospace">&#8373;${c.amount||0}</div>`).join(''):'<div class="empty">No conversions logged yet</div>';
+  }catch(e){document.getElementById('conversionsList').innerHTML='<div class="empty">Could not load conversions</div>';}
+}
+
+loadData();
+setInterval(loadData,15000);
+</script>
+</body>
+</html>
