@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>Enterprise Command System — BYINFORGH</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=Space+Mono:wght@400;700&display=swap');
+  :root{
+    --bg:#0a0a0a;--panel:#141210;--gold:#e8b84b;--gold-dim:#b8933a;
+    --cream:#f2ede0;--text:#f2ede0;--muted:#a89f8c;--line:#2a271f;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:radial-gradient(circle at 15% 0%,rgba(232,184,75,0.08),transparent 45%),radial-gradient(circle at 90% 100%,rgba(63,182,168,0.08),transparent 45%),var(--bg);color:var(--text);font-family:'Space Mono',monospace;}
+  .wrap{max-width:900px;margin:0 auto;padding:60px 24px 100px;}
+  .eyebrow{font-size:11px;letter-spacing:3px;color:var(--gold);text-transform:uppercase;margin-bottom:16px;}
+  h1{font-family:'Syne',sans-serif;font-weight:800;font-size:44px;line-height:1.15;margin:0 0 18px;color:var(--cream);}
+  h1 span{color:var(--gold);}
+  p.lead{font-size:15px;color:var(--muted);line-height:1.7;max-width:620px;margin-bottom:32px;}
+  .cta-row{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:60px;}
+  .btn{display:inline-flex;align-items:center;gap:8px;padding:15px 26px;border-radius:10px;font-family:'Syne',sans-serif;font-weight:700;font-size:14px;text-decoration:none;cursor:pointer;border:none;}
+  .btn-primary{background:var(--gold);color:#12100c;}
+  .btn-ghost{background:transparent;color:var(--text);border:1px solid var(--line);}
+  .section{margin-bottom:56px;}
+  .section h2{font-family:'Syne',sans-serif;font-size:20px;color:var(--cream);margin-bottom:18px;font-weight:700;}
+  .pillar-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px;}
+  .pillar{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:18px;}
+  .pillar .ic{font-size:22px;margin-bottom:8px;}
+  .pillar h3{font-family:'Syne',sans-serif;font-size:14px;color:var(--gold);margin:0 0 6px;}
+  .pillar ul{margin:0;padding-left:16px;font-size:12px;color:var(--muted);line-height:1.8;}
+  .stat-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;}
+  .stat{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:20px;text-align:center;}
+  .stat .n{font-family:'Syne',sans-serif;font-weight:800;font-size:30px;color:var(--gold);}
+  .stat .l{font-size:10px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-top:6px;}
+  .phase-row{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;}
+  @media(max-width:700px){.phase-row{grid-template-columns:1fr;}}
+  .phase{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:20px;}
+  .phase .num{width:32px;height:32px;border-radius:50%;border:1px solid var(--gold);color:var(--gold);display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:800;margin-bottom:12px;}
+  .phase h3{font-family:'Syne',sans-serif;font-size:14px;margin:0 0 8px;color:var(--cream);}
+  .phase p{font-size:12px;color:var(--muted);line-height:1.7;margin:0;}
+  .pricing-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+  @media(max-width:700px){.pricing-row{grid-template-columns:1fr;}}
+  .price-card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:22px;}
+  .price-card .tag{font-size:10px;color:var(--gold);letter-spacing:1px;text-transform:uppercase;margin-bottom:8px;}
+  .price-card .amt{font-family:'Syne',sans-serif;font-weight:800;font-size:26px;color:var(--cream);margin-bottom:14px;}
+  .price-card ul{margin:0;padding-left:16px;font-size:12px;color:var(--muted);line-height:1.9;}
+  footer{border-top:1px solid var(--line);padding-top:24px;font-size:11px;color:var(--muted);text-align:center;}
+  footer a{color:var(--gold);text-decoration:none;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">Enterprise Digital Infrastructure — Demo Preview</div>
+  <h1>One dashboard runs the <span>entire business.</span></h1>
+  <p class="lead">The Enterprise Command System unifies bookings, stock, payroll, facilities, membership, and executive reporting into a single live dashboard — built for hospitality, retail, and service businesses that have outgrown spreadsheets and disconnected apps.</p>
+  <div class="cta-row">
+    <a class="btn btn-primary" href="enterprise-command-demo.html">▶ Open the live demo dashboard</a>
+    <a class="btn btn-ghost" href="#pricing">See investment &amp; terms</a>
+  </div>
+
+  <div class="section">
+    <h2>Portfolio snapshot — what this system already runs</h2>
+    <div class="stat-row">
+      <div class="stat"><div class="n">50</div><div class="l">Active client accounts</div></div>
+      <div class="stat"><div class="n">10+</div><div class="l">Industries served</div></div>
+      <div class="stat"><div class="n">9</div><div class="l">Package tiers, free to enterprise</div></div>
+      <div class="stat"><div class="n">24/7</div><div class="l">Live dashboard uptime</div></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>Seven pillars, one system</h2>
+    <div class="pillar-grid">
+      <div class="pillar"><div class="ic">🌐</div><h3>Digital Presence</h3><ul><li>Website &amp; SEO</li><li>Content &amp; photography</li><li>Social media pipeline</li></ul></div>
+      <div class="pillar"><div class="ic">📦</div><h3>Operations</h3><ul><li>Stock &amp; inventory</li><li>Payroll</li><li>Procurement</li></ul></div>
+      <div class="pillar"><div class="ic">📱</div><h3>Customer Experience</h3><ul><li>QR ordering</li><li>Digital menu</li><li>Membership &amp; guest journey</li></ul></div>
+      <div class="pillar"><div class="ic">📊</div><h3>Management</h3><ul><li>Executive dashboard</li><li>Daily reports</li><li>KPIs &amp; analytics</li></ul></div>
+      <div class="pillar"><div class="ic">🧰</div><h3>Facilities</h3><ul><li>Maintenance tickets</li><li>Staff requests</li><li>Asset tracking</li></ul></div>
+      <div class="pillar"><div class="ic">🎓</div><h3>Training</h3><ul><li>SOPs</li><li>Documentation</li><li>Staff guides</li></ul></div>
+      <div class="pillar"><div class="ic">🛟</div><h3>Support</h3><ul><li>Updates</li><li>Maintenance</li><li>Ongoing consultation</li></ul></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>Implementation roadmap</h2>
+    <div class="phase-row">
+      <div class="phase"><div class="num">1</div><h3>Brand Engine</h3><p>Digital presence, high-end content, and staff SOPs — the foundation before automation.</p></div>
+      <div class="phase"><div class="num">2</div><h3>Business Engine</h3><p>Operations &amp; HR backend, live ordering, and the Master Executive Dashboard go live.</p></div>
+      <div class="phase"><div class="num">3</div><h3>Care &amp; Growth</h3><p>Priority support, database maintenance, and continuous optimisation.</p></div>
+    </div>
+  </div>
+
+  <div class="section" id="pricing">
+    <h2>Investment &amp; terms</h2>
+    <div class="pricing-row">
+      <div class="price-card"><div class="tag">One-time implementation</div><div class="amt">The Enterprise System Build</div><ul><li>Full custom scripting &amp; database integration</li><li>Professional web &amp; asset deployment</li><li>Hands-on staff SOP training</li></ul></div>
+      <div class="price-card"><div class="tag">Monthly retainer</div><div class="amt">Enterprise Care &amp; Updates</div><ul><li>Priority system diagnostic support</li><li>Continuous UI/UX &amp; feature optimisation</li><li>Automatic daily backups &amp; audit reports</li></ul></div>
+    </div>
+  </div>
+
+  <footer>
+    BYINFORGH SOLUTIONS — Enterprise Digital Infrastructure<br>
+    This page is a demo preview built with placeholder data. <a href="enterprise-command-demo.html">Open the live dashboard →</a>
+  </footer>
+</div>
+</body>
+</html>
