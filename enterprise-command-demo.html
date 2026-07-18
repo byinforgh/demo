@@ -3,274 +3,1486 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Enterprise Command System — Live Demo</title>
-<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<title>Enterprise Command System</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
-  :root{
-    --black:#0a0a0a; --surface:#111111; --card:#161514; --border:#2a2621;
-    --gold:#e8b84b; --gold-dim:#b8933a; --cream:#f2ede0; --muted:#8a8378;
-    --green:#3fb66f; --red:#e05a4e; --blue:#4a90c9; --purple:#a97be0; --teal:#3fb6a8;
-    --text:#f2ede0; --text-dim:#b3ab9c;
-  }
-  *{box-sizing:border-box;margin:0;padding:0;}
-  body{background:var(--black);color:var(--text);font-family:'Syne',sans-serif;min-height:100vh;}
-  .header{background:var(--surface);border-bottom:1px solid var(--border);padding:18px 28px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:50;}
-  .brand{display:flex;align-items:center;gap:12px;}
-  .brand .mark{width:38px;height:38px;border-radius:8px;background:linear-gradient(135deg,var(--gold),var(--gold-dim));display:flex;align-items:center;justify-content:center;color:#0a0a0a;font-weight:800;font-size:18px;}
-  .brand .name{font-weight:800;letter-spacing:1px;font-size:16px;}
-  .brand .tag{font-size:10px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-top:2px;}
-  .demo-badge{background:rgba(232,184,75,0.12);border:1px solid var(--gold);color:var(--gold);font-size:10px;font-weight:700;letter-spacing:1.5px;padding:6px 12px;border-radius:20px;}
-  .main{max-width:1400px;margin:0 auto;padding:28px;}
-  .demo-note{background:#1a1710;border:1px solid var(--gold-dim);border-radius:8px;padding:12px 16px;font-size:12px;color:var(--text-dim);margin-bottom:24px;line-height:1.6;}
-  .demo-note b{color:var(--gold);}
-  .kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px;margin-bottom:24px;}
-  .kpi{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:18px;position:relative;overflow:hidden;}
-  .kpi::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--accent,var(--gold));}
-  .kpi .label{font-size:10px;letter-spacing:2px;color:var(--muted);font-weight:700;margin-bottom:8px;}
-  .kpi .value{font-size:28px;font-weight:800;font-family:'Space Mono',monospace;color:var(--accent,var(--gold));}
-  .kpi .sub{font-size:11px;color:var(--text-dim);margin-top:6px;}
-  .section-title{font-size:11px;font-weight:700;letter-spacing:3px;color:var(--muted);text-transform:uppercase;margin:32px 0 12px;}
-  .grid-2{display:grid;grid-template-columns:1.3fr 1fr;gap:16px;}
-  @media(max-width:900px){.grid-2{grid-template-columns:1fr;}}
-  .card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:18px;}
-  .pillars{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;}
-  .pillar{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:14px;text-align:center;}
-  .pillar .ic{font-size:20px;margin-bottom:6px;}
-  .pillar .t{font-size:11px;font-weight:700;color:var(--cream);}
-  .pillar .s{font-size:9px;color:var(--muted);margin-top:4px;}
-  table{width:100%;border-collapse:collapse;font-size:12px;}
-  th{text-align:left;padding:9px 10px;color:var(--muted);font-weight:700;letter-spacing:1px;font-size:9px;border-bottom:1px solid var(--border);}
-  td{padding:8px 10px;border-bottom:1px solid #1c1a16;vertical-align:middle;}
-  tr:hover td{background:#1a1814;}
-  .tier-badge{display:inline-block;padding:3px 9px;border-radius:4px;font-size:9px;font-weight:700;letter-spacing:0.5px;white-space:nowrap;}
-  .status-dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:6px;}
-  .filter-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;}
-  .filter-btn{padding:6px 13px;border-radius:5px;border:1px solid var(--border);background:var(--surface);color:var(--text-dim);cursor:pointer;font-size:10px;font-weight:700;letter-spacing:1px;font-family:'Syne',sans-serif;}
-  .filter-btn.active{background:var(--gold);color:#0a0a0a;border-color:var(--gold);}
-  .filter-btn:hover:not(.active){border-color:var(--gold);color:var(--text);}
-  .search-input{background:var(--surface);border:1px solid var(--border);color:var(--text);padding:9px 13px;border-radius:6px;font-size:12px;font-family:'Syne',sans-serif;width:100%;outline:none;margin-bottom:14px;}
-  .search-input:focus{border-color:var(--gold);}
-  .activity-item{display:flex;gap:10px;padding:9px 0;border-bottom:1px solid #1c1a16;font-size:11px;}
-  .activity-item:last-child{border:none;}
-  .activity-dot{width:6px;height:6px;border-radius:50%;margin-top:5px;flex-shrink:0;}
-  .bar-wrap{display:flex;align-items:flex-end;gap:8px;height:150px;margin-top:14px;}
-  .bar-group{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;}
-  .bar{width:100%;border-radius:3px 3px 0 0;background:linear-gradient(180deg,var(--gold),var(--gold-dim));}
-  .bar-label{font-size:9px;color:var(--muted);font-family:'Space Mono',monospace;}
-  .scroll-table{overflow-x:auto;max-height:520px;overflow-y:auto;}
-  .footer-note{margin-top:36px;padding-top:18px;border-top:1px solid var(--border);font-size:11px;color:var(--muted);text-align:center;line-height:1.8;}
+:root{--black:#0a0a0a;--surface:#111111;--card:#161513;--border:#2a2621;--gold:#e8b84b;--gold-dim:#b8933a;--cream:#f2ede0;--muted:#8a8378;--green:#3fb66f;--red:#e05a4e;--blue:#4a90c9;--purple:#a97be0;--teal:#3fb6a8;--orange:#e0954a;--text:#f2ede0;--text-dim:#b3ab9c;}
+*{box-sizing:border-box;}
+body{margin:0;background:var(--black);color:var(--text);font-family:'Syne',sans-serif;}
+.hidden{display:none !important;}
+.mono{font-family:'Space Mono',monospace;}
+a{color:inherit;}
+button{font-family:'Syne',sans-serif;cursor:pointer;}
+input,select,textarea{font-family:'Syne',sans-serif;background:var(--surface);border:1px solid var(--border);color:var(--text);border-radius:6px;padding:9px 12px;font-size:12px;outline:none;width:100%;}
+input:focus,select:focus,textarea:focus{border-color:var(--gold);}
+label{display:block;font-size:10px;letter-spacing:1px;color:var(--gold);text-transform:uppercase;margin:12px 0 5px;}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:12px 22px;border-radius:8px;font-weight:700;font-size:13px;border:none;text-decoration:none;}
+.btn-primary{background:var(--gold);color:#0a0a0a;}
+.btn-ghost{background:transparent;color:var(--text);border:1px solid var(--border);}
+.btn-sm{padding:6px 12px;font-size:11px;border-radius:6px;}
+.btn-green{background:var(--green);color:#06210f;}
+.btn-red{background:transparent;border:1px solid var(--red);color:var(--red);}
+.btn-blue{background:var(--blue);color:#04121c;}
+.card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:18px;}
+.pill{display:inline-block;padding:3px 10px;border-radius:5px;font-size:9px;font-weight:700;letter-spacing:0.5px;white-space:nowrap;}
+.toast{position:fixed;bottom:24px;right:24px;background:var(--gold);color:#0a0a0a;padding:11px 18px;border-radius:8px;font-size:12px;font-weight:700;opacity:0;transform:translateY(14px);transition:all .3s;z-index:999;pointer-events:none;}
+.toast.show{opacity:1;transform:translateY(0);}
+
+/* ---------- NAV ---------- */
+.topnav{background:var(--surface);border-bottom:1px solid var(--border);padding:14px 24px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:80;}
+.brand{display:flex;align-items:center;gap:10px;}
+.brand .mark{width:32px;height:32px;border-radius:7px;background:linear-gradient(135deg,var(--gold),var(--gold-dim));display:flex;align-items:center;justify-content:center;color:#0a0a0a;font-weight:800;}
+.brand .name{font-weight:800;font-size:14px;letter-spacing:0.5px;}
+.brand .tag{font-size:9px;color:var(--muted);letter-spacing:1.5px;}
+.navlinks{display:flex;gap:6px;flex-wrap:wrap;}
+.navlinks button{background:none;border:1px solid transparent;color:var(--text-dim);padding:8px 14px;border-radius:6px;font-size:11px;font-weight:700;letter-spacing:0.5px;}
+.navlinks button.active{background:var(--gold);color:#0a0a0a;}
+.navlinks button:hover:not(.active){border-color:var(--border);color:var(--text);}
+
+/* ---------- LANDING ---------- */
+.wrap{max-width:960px;margin:0 auto;padding:56px 24px 90px;}
+.eyebrow{font-size:11px;letter-spacing:3px;color:var(--gold);text-transform:uppercase;margin-bottom:16px;}
+h1.hero{font-size:42px;line-height:1.15;margin:0 0 16px;font-weight:800;}
+h1.hero span{color:var(--gold);}
+p.lead{font-size:14px;color:var(--muted);line-height:1.75;max-width:600px;margin-bottom:28px;}
+.cta-row{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:50px;}
+.section{margin-bottom:48px;}
+.section h2{font-size:19px;margin-bottom:16px;font-weight:700;}
+.grid-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px;}
+.pillar-card .ic{font-size:20px;margin-bottom:8px;}
+.pillar-card h3{font-size:13px;color:var(--gold);margin:0 0 6px;}
+.pillar-card p{font-size:11px;color:var(--muted);line-height:1.6;margin:0;}
+.stat{text-align:center;}
+.stat .n{font-size:28px;font-weight:800;color:var(--gold);}
+.stat .l{font-size:9px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-top:5px;}
+.pricing-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:14px;}
+.price-card .tag{font-size:9px;color:var(--gold);letter-spacing:1px;text-transform:uppercase;margin-bottom:8px;}
+.price-card .amt{font-size:19px;font-weight:800;margin-bottom:4px;}
+.price-card .amt2{font-size:11px;color:var(--text-dim);margin-bottom:12px;}
+.price-card ul{margin:0;padding-left:15px;font-size:11px;color:var(--muted);line-height:1.9;}
+.price-card.flagship{border-color:var(--gold);background:linear-gradient(180deg,#1a170f,var(--card));}
+footer.landing-footer{border-top:1px solid var(--border);padding-top:20px;font-size:11px;color:var(--muted);text-align:center;}
+
+/* ---------- APPLY FORM ---------- */
+.apply-card{max-width:560px;margin:0 auto;}
+.form-row2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.success-box{background:#0e1a10;border:1px solid var(--green);border-radius:10px;padding:20px;text-align:center;}
+
+/* ---------- DASHBOARD ---------- */
+.dashwrap{max-width:1500px;margin:0 auto;padding:24px;}
+.dashtabs{display:flex;gap:4px;flex-wrap:wrap;background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:5px;margin-bottom:22px;}
+.dashtabs button{background:none;border:none;color:var(--text-dim);padding:8px 14px;border-radius:6px;font-size:11px;font-weight:700;letter-spacing:0.5px;}
+.dashtabs button.active{background:var(--gold);color:#0a0a0a;}
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:22px;}
+.kpi{border-radius:10px;padding:16px;background:var(--card);border:1px solid var(--border);border-top:2px solid var(--accent,var(--gold));}
+.kpi .label{font-size:9px;letter-spacing:1.5px;color:var(--muted);font-weight:700;margin-bottom:7px;}
+.kpi .value{font-size:24px;font-weight:800;color:var(--accent,var(--gold));}
+.kpi .sub{font-size:10px;color:var(--text-dim);margin-top:5px;}
+.section-title{font-size:11px;font-weight:700;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin:26px 0 12px;}
+table{width:100%;border-collapse:collapse;font-size:12px;}
+th{text-align:left;padding:8px 9px;color:var(--muted);font-weight:700;letter-spacing:1px;font-size:9px;border-bottom:1px solid var(--border);}
+td{padding:8px 9px;border-bottom:1px solid #1c1a16;vertical-align:middle;}
+tr.rowlink{cursor:pointer;}
+tr.rowlink:hover td{background:#1c1a16;}
+.scroll-table{overflow:auto;max-height:520px;}
+.filter-row{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:12px;}
+.filter-btn{padding:6px 12px;border-radius:5px;border:1px solid var(--border);background:var(--surface);color:var(--text-dim);font-size:10px;font-weight:700;}
+.filter-btn.active{background:var(--gold);color:#0a0a0a;border-color:var(--gold);}
+.grid-2{display:grid;grid-template-columns:1.2fr 1fr;gap:16px;}
+@media(max-width:900px){.grid-2{grid-template-columns:1fr;}.form-row2{grid-template-columns:1fr;}}
+.activity-item{display:flex;gap:9px;padding:8px 0;border-bottom:1px solid #1c1a16;font-size:11px;}
+.activity-item:last-child{border:none;}
+.dot{width:7px;height:7px;border-radius:50%;margin-top:5px;flex-shrink:0;}
+.bar-wrap{display:flex;align-items:flex-end;gap:10px;height:150px;margin-top:12px;}
+.bar-group{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;}
+.bar{width:100%;border-radius:3px 3px 0 0;background:linear-gradient(180deg,var(--gold),var(--gold-dim));}
+.bar-vlabel{font-size:8px;color:var(--muted);writing-mode:vertical-rl;text-orientation:mixed;height:56px;}
+
+.module-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;}
+.module-card{cursor:pointer;transition:border-color .15s,transform .15s;}
+.module-card:hover{border-color:var(--gold);transform:translateY(-2px);}
+.module-card .count{font-size:22px;font-weight:800;color:var(--gold);margin-top:8px;}
+
+/* module workspace */
+.modtabs{display:flex;gap:4px;flex-wrap:wrap;border-bottom:1px solid var(--border);margin-bottom:16px;padding-bottom:10px;}
+.modtabs button{background:var(--surface);border:1px solid var(--border);color:var(--text-dim);padding:7px 13px;border-radius:6px;font-size:10px;font-weight:700;letter-spacing:0.5px;}
+.modtabs button.active{background:var(--gold);color:#0a0a0a;border-color:var(--gold);}
+.kanban{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;}
+.kcol{background:var(--surface);border-radius:10px;padding:10px;border-top:2px solid var(--accent,var(--gold));}
+.kcol .khead{font-size:10px;font-weight:700;letter-spacing:1px;color:var(--accent,var(--gold));margin-bottom:8px;}
+.kcard{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:9px;margin-bottom:8px;cursor:pointer;font-size:11px;}
+.kcard:hover{border-color:var(--gold);}
+.kcard .kc-title{font-weight:700;}
+.kcard .kc-sub{color:var(--muted);font-size:9px;margin-top:3px;}
+.sig-pill{display:inline-flex;align-items:center;gap:4px;font-size:9px;padding:2px 7px;border-radius:5px;background:#1c1a16;}
+.msg-card{border:1px solid var(--border);border-radius:8px;padding:12px;margin-bottom:10px;background:var(--surface);}
+.msg-card h4{margin:0 0 8px;font-size:12px;color:var(--gold);}
+.followup-row{border:1px solid var(--border);border-radius:8px;padding:12px;margin-bottom:10px;background:var(--surface);}
+.followup-row .fu-head{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px;margin-bottom:8px;}
+.doc-note{background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--gold);border-radius:6px;padding:12px 14px;font-size:12px;color:var(--text-dim);line-height:1.7;margin-bottom:10px;}
+
+/* modal / drawer */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.78);display:flex;align-items:flex-start;justify-content:center;padding:40px 16px;overflow-y:auto;z-index:200;}
+.modal{background:var(--card);border:1px solid var(--gold);border-radius:12px;padding:26px;width:100%;max-width:680px;}
+.modal-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px;}
+.modal-close{background:none;border:1px solid var(--border);color:var(--text);padding:4px 10px;border-radius:5px;font-size:15px;}
+.detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;font-size:12px;}
+.detail-grid .k{color:var(--muted);font-size:9px;letter-spacing:1px;text-transform:uppercase;}
+.detail-grid .v{margin-top:2px;}
+.module-check-row{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0 4px;}
+.module-check{display:flex;align-items:center;gap:5px;font-size:10px;background:var(--surface);border:1px solid var(--border);border-radius:5px;padding:5px 9px;}
+.timeline-item{padding:7px 0;border-bottom:1px solid #1c1a16;font-size:11px;}
+.docs-block{margin-bottom:22px;}
+.docs-block h3{font-size:13px;color:var(--gold);margin-bottom:6px;}
+.docs-block p{font-size:12px;color:var(--text-dim);line-height:1.7;margin:0 0 6px;}
+.docs-block ul{margin:0 0 6px;padding-left:18px;font-size:12px;color:var(--text-dim);line-height:1.8;}
+.record-row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #1c1a16;gap:10px;flex-wrap:wrap;}
+.record-row:last-child{border:none;}
 </style>
 </head>
 <body>
-<div class="header">
+
+<div class="topnav">
   <div class="brand">
     <div class="mark">E</div>
-    <div><div class="name">ENTERPRISE COMMAND SYSTEM</div><div class="tag">Unified Business Operating Dashboard</div></div>
+    <div><div class="name">ENTERPRISE COMMAND SYSTEM</div><div class="tag">BYINFORGH SOLUTIONS · DEMO BUILD</div></div>
   </div>
-  <div class="demo-badge">● LIVE DEMO DATA</div>
-</div>
-
-<div class="main">
-  <div class="demo-note">
-    <b>This is a working demo</b>, pre-loaded with 50 generated portfolio-client records across ten industries to show the system's shape at real scale. No client identities are used anywhere in this build — every name below is a generated placeholder. Every number, chart, and table on this page is computed live in your browser from that data, exactly the way the production dashboard computes from a live Google Sheet.
-  </div>
-
-  <div class="kpi-grid" id="kpiGrid"></div>
-
-  <div class="section-title">System Architecture — What This Dashboard Runs On</div>
-  <div class="pillars" id="pillarsGrid"></div>
-
-  <div class="grid-2" style="margin-top:24px">
-    <div class="card">
-      <div class="section-title" style="margin-top:0">Revenue by Tier</div>
-      <div class="bar-wrap" id="revChart"></div>
-    </div>
-    <div class="card">
-      <div class="section-title" style="margin-top:0">Live Activity Feed</div>
-      <div id="activityFeed"></div>
-    </div>
-  </div>
-
-  <div class="section-title">Client Portfolio — 50 Active Records</div>
-  <input class="search-input" id="clientSearch" placeholder="Search by industry, tier, status, region..." oninput="renderClients()">
-  <div class="filter-row" id="tierFilters"></div>
-  <div class="card">
-    <div class="scroll-table">
-      <table>
-        <thead><tr><th>ID</th><th>Industry</th><th>Region</th><th>Package Tier</th><th>Monthly Value</th><th>Status</th><th>Renewal</th><th>Health</th></tr></thead>
-        <tbody id="clientBody"></tbody>
-      </table>
-    </div>
-  </div>
-
-  <div class="section-title">Renewals — Next 45 Days</div>
-  <div class="card">
-    <div class="scroll-table" style="max-height:300px">
-      <table>
-        <thead><tr><th>ID</th><th>Industry</th><th>Package Tier</th><th>Value</th><th>Renewal Date</th><th>Days Out</th></tr></thead>
-        <tbody id="renewalBody"></tbody>
-      </table>
-    </div>
-  </div>
-
-  <div class="footer-note">
-    Enterprise Command System — a single dashboard unifying client pipeline, package tiers, renewals, revenue reporting, and daily activity for a services or hospitality business.<br>
-    All data on this page is generated locally for demonstration. Nothing here is transmitted anywhere.
+  <div class="navlinks">
+    <button id="nav-landing" onclick="setView('landing')">OVERVIEW SITE</button>
+    <button id="nav-apply" onclick="setView('apply')">APPLY / ADD CLIENT</button>
+    <button id="nav-dashboard" onclick="setView('dashboard')">COMMAND CENTRE →</button>
   </div>
 </div>
+
+<!-- ============ LANDING ============ -->
+<div id="view-landing" class="wrap">
+  <div class="eyebrow">Enterprise Digital Infrastructure</div>
+  <h1 class="hero">One command centre runs the <span>entire enterprise.</span></h1>
+  <p class="lead">The Enterprise Command System is a single operating dashboard unifying bookings, stock, payroll, facilities, membership, brand, and executive reporting for high-ticket hospitality, retail, and service businesses — replacing a stack of disconnected spreadsheets and apps with one live system. Every department below runs its own full pipeline, message library, follow-up queue, call log, and archive — not just a shared inbox.</p>
+  <div class="cta-row">
+    <button class="btn btn-primary" onclick="setView('apply')">Apply for Enterprise Onboarding →</button>
+    <button class="btn btn-ghost" onclick="setView('dashboard')">Open the live Command Centre</button>
+  </div>
+
+  <div class="section">
+    <h2>Portfolio snapshot</h2>
+    <div class="grid-cards" id="landingStats"></div>
+  </div>
+
+  <div class="section">
+    <h2>Seven pillars, one system — each with its own department dashboard</h2>
+    <div class="grid-cards" id="landingPillars"></div>
+  </div>
+
+  <div class="section">
+    <h2>The cost of staying fragmented</h2>
+    <div class="grid-cards" style="grid-template-columns:1fr 1fr">
+      <div class="card" style="border-color:var(--red)">
+        <div style="font-weight:800;color:var(--red);font-size:13px;margin-bottom:10px">⚠ Manual, fragmented operation</div>
+        <ul style="margin:0;padding-left:16px;font-size:12px;color:var(--muted);line-height:2">
+          <li>Disconnected booking entries, double-bookings go unnoticed</li>
+          <li>Inventory discrepancies between counter, bar, and stockroom</li>
+          <li>Payroll tracked by hand — days of admin every cycle</li>
+          <li>Executive decisions made on reports that are already a week old</li>
+          <li>No single place to see what's actually happening today</li>
+        </ul>
+      </div>
+      <div class="card" style="border-color:var(--green)">
+        <div style="font-weight:800;color:var(--green);font-size:13px;margin-bottom:10px">✓ Enterprise Command System</div>
+        <ul style="margin:0;padding-left:16px;font-size:12px;color:var(--muted);line-height:2">
+          <li>Bookings flow automatically into one live calendar</li>
+          <li>Stock synced in real time across every location</li>
+          <li>Payroll calculated automatically, every cycle</li>
+          <li>A live executive dashboard — accurate to the minute, not the month</li>
+          <li>One login. Every pillar of the business, visible and searchable</li>
+        </ul>
+      </div>
+    </div>
+    <div class="card" style="margin-top:14px;text-align:center">
+      <div style="font-size:12px;color:var(--muted);line-height:1.8">Average high-ticket hospitality and service businesses lose <b style="color:var(--gold)">10–15% of monthly revenue</b> to exactly the leaks on the left — unrecorded sales, stock drift, booking friction. On a conservative GH₵300,000 monthly turnover, that is over <b style="color:var(--gold)">GH₵45,000 leaking out every single month</b>. Sealing that leak alone recovers a Flagship build cost inside roughly six months — everything after that is permanent margin.</div>
+    </div>
+  </div>
+
+  <div class="section" id="pricing">
+    <h2>Investment tiers</h2>
+    <div class="pricing-grid" id="landingPricing"></div>
+  </div>
+
+  <div class="section">
+    <h2>Why saying yes is the safer decision</h2>
+    <div class="grid-cards">
+      <div class="card"><h3 style="font-size:13px;color:var(--gold);margin:0 0 6px">"We already have spreadsheets."</h3><p style="font-size:11px;color:var(--muted);line-height:1.7;margin:0">Spreadsheets don't alert anyone, don't sync across locations, and break the moment two people edit at once. This system replaces the spreadsheet with a live, multi-user, always-current dashboard — and every existing spreadsheet's data can migrate in during onboarding.</p></div>
+      <div class="card"><h3 style="font-size:13px;color:var(--gold);margin:0 0 6px">"This is a big investment."</h3><p style="font-size:11px;color:var(--muted);line-height:1.7;margin:0">It's priced against what leakage is already costing monthly, not against a hypothetical. The Foundation tier alone typically pays for itself within a single quarter once bookings, stock, and payroll stop silently losing revenue.</p></div>
+      <div class="card"><h3 style="font-size:13px;color:var(--gold);margin:0 0 6px">"Will our team actually use it?"</h3><p style="font-size:11px;color:var(--muted);line-height:1.7;margin:0">Every tier includes hands-on staff SOP training and documentation built into the system itself — see the Documentation tab inside each department. Staff are never handed a system without a written guide for exactly how to run it.</p></div>
+      <div class="card"><h3 style="font-size:13px;color:var(--gold);margin:0 0 6px">"What if we need support later?"</h3><p style="font-size:11px;color:var(--muted);line-height:1.7;margin:0">The monthly retainer isn't optional maintenance — it's 24/7 priority diagnostic support, continuous optimisation, automatic daily backups, and a monthly operational audit report, for as long as the account is active.</p></div>
+    </div>
+  </div>
+
+  <footer class="landing-footer">
+    BYINFORGH SOLUTIONS — Enterprise Digital Infrastructure. This is a live working demo: applying below creates a real record inside the Command Centre pipeline, and every dashboard tab is fully functional, not a mockup.
+  </footer>
+</div>
+
+<!-- ============ APPLY ============ -->
+<div id="view-apply" class="wrap hidden">
+  <div class="eyebrow">New Client Intake</div>
+  <h1 class="hero" style="font-size:30px">Apply for Enterprise Onboarding</h1>
+  <p class="lead">This form writes directly into the Command Centre — submit it and the record appears immediately in the Pipeline tab as a new Prospect, with a full detail record and activity log entry, exactly as a real intake would.</p>
+  <div class="card apply-card" id="applyCardWrap">
+    <div id="applyForm">
+      <label>Business alias / working name *</label>
+      <input id="ap_name" placeholder="e.g. Client — Boutique Hotel, Accra">
+      <div class="form-row2">
+        <div><label>Industry *</label><select id="ap_industry"></select></div>
+        <div><label>Region *</label><select id="ap_region"></select></div>
+      </div>
+      <div class="form-row2">
+        <div><label>Contact name *</label><input id="ap_contact" placeholder="Full name"></div>
+        <div><label>Contact number *</label><input id="ap_number" placeholder="0XXXXXXXXX"></div>
+      </div>
+      <label>Interested tier *</label>
+      <select id="ap_tier"></select>
+      <label>What's the main challenge right now? (optional)</label>
+      <textarea id="ap_notes" rows="3" placeholder="e.g. No unified system across three locations, payroll is manual..."></textarea>
+      <div id="applyErr" style="color:var(--red);font-size:11px;margin-top:8px"></div>
+      <button class="btn btn-primary" style="width:100%;margin-top:14px;justify-content:center" onclick="submitApplication()">Submit application →</button>
+    </div>
+    <div id="applySuccess" class="success-box hidden">
+      <div style="font-size:28px;margin-bottom:8px">✓</div>
+      <div style="font-weight:800;font-size:15px;margin-bottom:6px">Application logged.</div>
+      <div style="font-size:12px;color:var(--text-dim);margin-bottom:14px" id="applySuccessDetail"></div>
+      <button class="btn btn-primary btn-sm" onclick="goToNewLead()">View this record in the Command Centre →</button>
+    </div>
+  </div>
+
+  <div class="section" style="margin-top:40px">
+    <h2 style="font-size:15px">Internal manual add (staff use)</h2>
+    <p style="font-size:11px;color:var(--muted);margin-bottom:10px">Same intake, for adding an already-signed client directly without the public form — lets you set stage and contract value on entry.</p>
+    <button class="btn btn-ghost" onclick="setView('dashboard');setDashTab('addclient')">Open internal Add Client form →</button>
+  </div>
+</div>
+
+<!-- ============ DASHBOARD ============ -->
+<div id="view-dashboard" class="dashwrap hidden">
+  <div class="dashtabs" id="dashTabs"></div>
+  <div id="dashBody"></div>
+</div>
+
+<div class="toast" id="toast"></div>
+<div id="modalRoot"></div>
 
 <script>
-// ---------- seeded RNG so the demo looks the same every time it's opened ----------
-function mulberry32(seed){return function(){seed|=0;seed=seed+0x6D2B79F5|0;let t=Math.imul(seed^seed>>>15,1|seed);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
-const rand=mulberry32(20260718);
-function pick(arr){return arr[Math.floor(rand()*arr.length)];}
-function randInt(min,max){return Math.floor(rand()*(max-min+1))+min;}
-
+/* ============================================================
+   DATA MODEL
+   ============================================================ */
 const INDUSTRIES=['Hospitality & Lodging','Fine Dining','Retail & Fashion','Wellness & Spa','Real Estate','Logistics & Transport','Automotive Services','Education & Training','Healthcare Clinic','Events & Venues','Salon & Beauty','Construction & Trade'];
 const REGIONS=['Greater Accra','Ashanti','Eastern Region','Central Region','Western Region','Volta Region'];
+const STAGES=['Prospect','Onboarding','Active','Renewal Due','Paused','Churned'];
+const STAGE_COLOR={'Prospect':'var(--blue)','Onboarding':'var(--purple)','Active':'var(--green)','Renewal Due':'var(--gold)','Paused':'var(--muted)','Churned':'var(--red)'};
+
+// High-ticket enterprise tiers — one-time infrastructure build + monthly retainer.
 const TIERS=[
-  {name:'Business Presence',color:'var(--muted)',monthly:0,weight:6},
-  {name:'Verified Business',color:'var(--teal)',monthly:80,weight:14},
-  {name:'Visibility Partner — T1',color:'var(--blue)',monthly:250,weight:10},
-  {name:'Visibility Partner — T2',color:'var(--blue)',monthly:750,weight:6},
-  {name:'Business Authority',color:'var(--purple)',monthly:5000,weight:3},
-  {name:'SME Systems — Starter',color:'var(--green)',monthly:50,weight:8},
-  {name:'SME Systems — Growth',color:'var(--green)',monthly:150,weight:6},
-  {name:'SME Systems — Authority',color:'var(--green)',monthly:500,weight:3},
-  {name:'Enterprise Command System',color:'var(--gold)',monthly:15000,weight:2}
+  {key:'foundation',name:'Foundation Infrastructure',build:45000,monthly:4500,weight:14,blurb:'Digital presence + one operational pipeline live.'},
+  {key:'growth',     name:'Growth Infrastructure',    build:95000,monthly:8500,weight:11,blurb:'Multi-module operations + executive dashboard.'},
+  {key:'enterprise', name:'Enterprise Infrastructure', build:175000,monthly:12500,weight:8,blurb:'Full seven-pillar deployment across all locations.'},
+  {key:'flagship',   name:'Flagship Command System',  build:250000,monthly:15000,weight:5,blurb:'White-glove build, dedicated team, 24/7 priority care.'}
 ];
-function weightedTier(){
-  const total=TIERS.reduce((s,t)=>s+t.weight,0);let r=rand()*total;
-  for(const t of TIERS){if(r<t.weight)return t;r-=t.weight;}
-  return TIERS[0];
-}
-const STATUSES=[{n:'Active',c:'var(--green)',w:38},{n:'Onboarding',c:'var(--blue)',w:5},{n:'Renewal Due',c:'var(--gold)',w:5},{n:'Paused',c:'var(--muted)',w:2}];
-function weightedStatus(){const total=STATUSES.reduce((s,t)=>s+t.w,0);let r=rand()*total;for(const s of STATUSES){if(r<s.w)return s;r-=s.w;}return STATUSES[0];}
 
-const clients=[];
-for(let i=1;i<=50;i++){
-  const tier=weightedTier();
-  const status=weightedStatus();
-  const daysToRenew=randInt(-10,120);
-  const d=new Date();d.setDate(d.getDate()+daysToRenew);
-  clients.push({
-    id:'ECS-'+String(1000+i),
-    industry:pick(INDUSTRIES),
-    region:pick(REGIONS),
-    tier:tier.name,tierColor:tier.color,monthly:tier.monthly,
-    status:status.n,statusColor:status.c,
-    renewal:d,
-    health:randInt(58,99)
+const MODULES=[
+  {id:'digital',    icon:'🌐', title:'Digital Presence',      desc:'Website, SEO, content calendar, and social pipeline.',        label:'Content / Asset Item'},
+  {id:'operations',icon:'📦', title:'Operations',            desc:'Stock, inventory, payroll runs, and procurement.',            label:'Stock / Payroll Entry'},
+  {id:'cx',         icon:'📱', title:'Customer Experience',   desc:'QR ordering, digital menu, guest journey, membership.',       label:'Booking / Membership Event'},
+  {id:'management', icon:'📊', title:'Management',            desc:'Executive dashboard, daily reports, KPI tracking.',           label:'Report / KPI Entry'},
+  {id:'facilities', icon:'🧰', title:'Facilities',            desc:'Maintenance tickets, staff requests, asset tracking.',        label:'Maintenance Ticket'},
+  {id:'training',   icon:'🎓', title:'Training',              desc:'SOPs, documentation, staff onboarding guides.',               label:'SOP / Guide'},
+  {id:'support',    icon:'🛟', title:'Support',                desc:'System updates, maintenance requests, consultation log.',     label:'Support Request'}
+];
+
+// Per-record pipeline stage — how a single item inside a department moves.
+const MODULE_STAGES=['New','Contacted','Follow-Up','In Progress','Resolved','Rejected'];
+const STAGE_COLOR2={'New':'var(--blue)','Contacted':'var(--purple)','Follow-Up':'var(--gold)','In Progress':'var(--teal)','Resolved':'var(--green)','Rejected':'var(--red)'};
+
+// WhatsApp-style signal — a single at-a-glance status per record/contact.
+const SIGNALS=[
+  {key:'no_response', icon:'🔴', name:'No Response — Call Only', color:'var(--red)',    meaning:'Message delivered but never read. Switch to a direct call.'},
+  {key:'unread',       icon:'🟡', name:'Delivered, Unread',       color:'#eab308',       meaning:'Sent but not opened yet. Wait before sending something new.'},
+  {key:'read_noreply', icon:'🟠', name:'Read, No Reply',          color:'var(--orange)', meaning:'Seen, no response. Needs a different angle, not a repeat.'},
+  {key:'active',       icon:'🟢', name:'Active Conversation',     color:'var(--green)',  meaning:'Currently exchanging messages — keep momentum.'},
+  {key:'hot',          icon:'🔵', name:'Hot / Priority',          color:'var(--blue)',   meaning:'Time-sensitive — action today.'},
+  {key:'rejected',     icon:'⬛', name:'Rejected / Archived',     color:'var(--muted)',  meaning:'Declined or closed out. Lives in Archive, restorable.'}
+];
+function signalFor(key){return SIGNALS.find(s=>s.key===key)||SIGNALS[1];}
+function weightedSignalKey(){
+  const w=[{k:'no_response',w:2},{k:'unread',w:6},{k:'read_noreply',w:4},{k:'active',w:6},{k:'hot',w:3}];
+  const total=w.reduce((s,x)=>s+x.w,0);let r=rand()*total;for(const x of w){if(r<x.w)return x.k;r-=x.w;}return 'unread';
+}
+
+function mulberry32(seed){return function(){seed|=0;seed=seed+0x6D2B79F5|0;let t=Math.imul(seed^seed>>>15,1|seed);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+let rand=mulberry32(20260718);
+function pick(arr){return arr[Math.floor(rand()*arr.length)];}
+function randInt(min,max){return Math.floor(rand()*(max-min+1))+min;}
+function weightedPick(list){const total=list.reduce((s,x)=>s+x.weight,0);let r=rand()*total;for(const x of list){if(r<x.weight)return x;r-=x.weight;}return list[0];}
+function uid(prefix){return prefix+'-'+Math.random().toString(36).slice(2,7).toUpperCase();}
+function fmtMoney(n){return 'GH₵ '+Math.round(n).toLocaleString();}
+function fmtDate(d){const dt=(d instanceof Date)?d:new Date(d);return dt.toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'});}
+function todayStr(){return new Date().toISOString().slice(0,10);}
+function isToday(ts){return new Date(ts).toISOString().slice(0,10)===todayStr();}
+function daysBetween(a,b){return Math.round((new Date(a)-new Date(b))/86400000);}
+function escapeHtml(s){return (s||'').toString().replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function personalize(body,client,rec){
+  return (body||'')
+    .replaceAll('{name}', client?(client.contactName||client.name):'the team')
+    .replaceAll('{business}', client?client.name:'your business')
+    .replaceAll('{title}', rec?rec.title:'')
+    .replaceAll('{region}', rec?(rec.region||''):'');
+}
+function waLink(number,text){
+  const digits=(number||'').replace(/\D/g,'');
+  return 'https://wa.me/'+digits+'?text='+encodeURIComponent(text||'');
+}
+async function copyText(text){
+  try{ await navigator.clipboard.writeText(text); showToast('Copied to clipboard'); }
+  catch(e){ showToast('Copy failed — select and copy manually'); }
+}
+
+let state={clients:[],activity:[],records:[],calls:[],dailyOutreach:[],messageLibrary:{},tiers:TIERS,
+  view:'landing',dashTab:'overview',selectedClientId:null,selectedModuleId:null,moduleTab:'overview',
+  selectedRecordId:null,pipelineHighlight:null};
+
+/* ============================================================
+   SEED DEFAULT DATA (used only if storage is empty)
+   ============================================================ */
+function seedClients(){
+  const out=[];
+  const today=new Date();
+  for(let i=1;i<=50;i++){
+    const tier=weightedPick(TIERS);
+    const stageRoll=rand();
+    let stage='Active';
+    if(stageRoll<0.08)stage='Prospect';else if(stageRoll<0.16)stage='Onboarding';else if(stageRoll<0.85)stage='Active';else if(stageRoll<0.94)stage='Renewal Due';else stage='Paused';
+    const renewal=new Date(today.getTime()+randInt(-10,150)*86400000);
+    const created=new Date(today.getTime()-randInt(30,700)*86400000);
+    const activeModules=MODULES.filter(()=>rand()>0.35).map(m=>m.id);
+    out.push({
+      id:uid('ECS'),name:'Client — '+pick(INDUSTRIES)+' Account '+i,industry:pick(INDUSTRIES),region:pick(REGIONS),
+      tierKey:tier.key,stage:stage,contractValue:tier.build,monthly:tier.monthly,
+      health:randInt(55,99),renewal:renewal.toISOString(),created:created.toISOString(),
+      modules:activeModules,notes:'',contactName:'',contactNumber:''
+    });
+  }
+  return out;
+}
+function seedActivity(clients){
+  const templates=['moved to Active after onboarding call','renewed contract for another 12 months','upgraded infrastructure tier','monthly executive report generated','flagged as Renewal Due — outreach scheduled','module deployment completed','facilities ticket resolved','payroll cycle processed','new lead converted from referral','staff SOP training completed'];
+  const out=[];
+  for(let i=0;i<30;i++){
+    const c=pick(clients);
+    const mins=randInt(4,4000);
+    out.push({id:uid('ACT'),clientId:c.id,clientName:c.name,text:templates[randInt(0,templates.length-1)],ts:Date.now()-mins*60000});
+  }
+  return out.sort((a,b)=>b.ts-a.ts);
+}
+function seedRecords(clients){
+  const out=[];
+  MODULES.forEach(m=>{
+    const n=randInt(5,8);
+    for(let i=0;i<n;i++){
+      const c=pick(clients);
+      const stage=pick(MODULE_STAGES.slice(0,5)); // mostly not-rejected on seed
+      const created=Date.now()-randInt(1,90)*86400000;
+      const fu=Date.now()+randInt(-4,10)*86400000;
+      out.push({
+        id:uid('REC'),module:m.id,clientId:c.id,clientName:c.name,region:c.region||pick(REGIONS),
+        title:m.label+' #'+randInt(100,999),
+        detail:'Auto-generated demo record for '+m.title.toLowerCase()+' on '+c.name+'.',
+        stage:stage, waSignal:weightedSignalKey(), archived:stage==='Rejected',
+        nextFollowUp:new Date(fu).toISOString().slice(0,10), notes:'',
+        history:[{ts:created,text:'Record created.'}],
+        ts:created
+      });
+    }
   });
+  return out.sort((a,b)=>b.ts-a.ts);
+}
+function seedCalls(records){
+  const outcomes=['Answered — interested','No answer','Wrong number','Call back later','Answered — resolved'];
+  const out=[];
+  for(let i=0;i<12;i++){
+    const r=pick(records);
+    out.push({id:uid('CALL'),module:r.module,recordId:r.id,clientId:r.clientId,clientName:r.clientName,
+      outcome:pick(outcomes),notes:'Demo call log entry.',nextAction:'Follow up in 3 days',
+      ts:Date.now()-randInt(1,30)*86400000});
+  }
+  return out.sort((a,b)=>b.ts-a.ts);
+}
+function seedDailyOutreach(){
+  const out=[];
+  for(let i=0;i<20;i++){ out.push({id:uid('OUT'),note:'WhatsApp message sent',ts:Date.now()-randInt(0,10)*86400000}); }
+  return out;
+}
+function seedMessageLibrary(){
+  return {
+    digital:{
+      cold:[
+        {id:uid('MSG'),title:'Content Approval Request',body:'Hi {name}, the latest content batch for {business} is ready for review. Can you approve or flag changes today?'},
+        {id:uid('MSG'),title:'SEO Check-in',body:'Hi {name}, quick update — {business} is now indexed for its core local search terms. Sharing the ranking screenshot shortly.'}
+      ],
+      followup:[
+        {id:uid('MSG'),title:'Review Reminder',body:'Hi {name}, following up on "{title}" — still waiting on your sign-off before we publish. Any changes needed?'}
+      ],
+      objections:[
+        {id:uid('MSG'),title:'"Not sure about the new design"',body:'Totally fair — let\'s hop on a 10-min call so I can walk you through the reasoning behind the design choices for {business}.'}
+      ]
+    },
+    operations:{
+      cold:[
+        {id:uid('MSG'),title:'Stock Discrepancy Alert',body:'Hi {name}, we found a variance during today\'s stock count on "{title}". Flagging before it affects next payroll cycle.'},
+        {id:uid('MSG'),title:'Payroll Cycle Reminder',body:'Hi {name}, this cycle\'s payroll run is ready for your review — figures attached, approve by end of day.'}
+      ],
+      followup:[
+        {id:uid('MSG'),title:'Procurement Follow-up',body:'Hi {name}, checking in on the procurement request "{title}" — supplier confirmed delivery window, want me to lock it in?'}
+      ],
+      objections:[
+        {id:uid('MSG'),title:'"The stock count looks wrong"',body:'Understood — sending the full count log for "{title}" now so we can reconcile together line by line.'}
+      ]
+    },
+    cx:{
+      cold:[
+        {id:uid('MSG'),title:'Booking Confirmation',body:'Hi {name}, your booking "{title}" for {business} is confirmed. Reply here if anything changes.'},
+        {id:uid('MSG'),title:'Membership Renewal Nudge',body:'Hi {name}, {business}\'s membership tier is up for renewal — want me to lock in the same benefits?'}
+      ],
+      followup:[
+        {id:uid('MSG'),title:'No-show Follow-up',body:'Hi {name}, we missed you for "{title}" — want to rebook, or was there an issue we should know about?'}
+      ],
+      objections:[
+        {id:uid('MSG'),title:'Refund / complaint handling',body:'I\'m sorry about the experience with "{title}" — here\'s exactly what we\'ll do to make it right for {business}.'}
+      ]
+    },
+    management:{
+      cold:[
+        {id:uid('MSG'),title:'Report Ready Notification',body:'Hi {name}, the latest KPI report "{title}" for {business} is ready on the dashboard.'},
+        {id:uid('MSG'),title:'KPI Review Reminder',body:'Hi {name}, this month\'s KPIs are trending {region ? "in "+region : "as expected"} — want a 10-min walkthrough?'}
+      ],
+      followup:[
+        {id:uid('MSG'),title:'Action Item Check-in',body:'Hi {name}, following up on the action item from "{title}" — where are we on this?'}
+      ],
+      objections:[
+        {id:uid('MSG'),title:'Handling a missed target',body:'Let\'s look at "{title}" together — here\'s what moved the number and the plan to correct course next cycle.'}
+      ]
+    },
+    facilities:{
+      cold:[
+        {id:uid('MSG'),title:'New Ticket Acknowledgement',body:'Hi {name}, we\'ve logged your maintenance request "{title}" for {business} and assigned it for review. Update within 24 hours.'},
+        {id:uid('MSG'),title:'Asset Inspection Notice',body:'Hi {name}, scheduled inspection for "{title}" is coming up — let us know if the time slot works.'}
+      ],
+      followup:[
+        {id:uid('MSG'),title:'Ticket Status Check',body:'Hi {name}, following up on ticket "{title}" — still on track, confirming timeline with the vendor now.'}
+      ],
+      objections:[
+        {id:uid('MSG'),title:'Handling a delay complaint',body:'Understood the delay on "{title}" is frustrating — here\'s exactly where things stand and the new completion date.'}
+      ]
+    },
+    training:{
+      cold:[
+        {id:uid('MSG'),title:'Staff Onboarding Reminder',body:'Hi {name}, {business}\'s new staff SOP pack "{title}" is ready — schedule a run-through this week?'},
+        {id:uid('MSG'),title:'SOP Completion Reminder',body:'Hi {name}, just checking — has the team finished going through "{title}" yet?'}
+      ],
+      followup:[
+        {id:uid('MSG'),title:'Training Follow-up',body:'Hi {name}, following up on "{title}" — any questions from the team after the first session?'}
+      ],
+      objections:[
+        {id:uid('MSG'),title:'"Too busy to train right now"',body:'No problem — we can split "{title}" into two 15-minute sessions so it fits around service hours.'}
+      ]
+    },
+    support:{
+      cold:[
+        {id:uid('MSG'),title:'Support Request Acknowledgement',body:'Hi {name}, got your support request "{title}" for {business} — looking into it now, update shortly.'},
+        {id:uid('MSG'),title:'System Update Notice',body:'Hi {name}, a small system update is going out tonight covering "{title}" — no downtime expected.'}
+      ],
+      followup:[
+        {id:uid('MSG'),title:'Post-resolution Check-in',body:'Hi {name}, following up after resolving "{title}" — everything running smoothly on your end?'}
+      ],
+      objections:[
+        {id:uid('MSG'),title:'"This keeps happening"',body:'You\'re right to flag the repeat issue with "{title}" — here\'s the root-cause fix we\'re putting in this time, not just a patch.'}
+      ]
+    }
+  };
 }
 
-function fmtDate(d){return d.toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'});}
-function fmtMoney(n){return 'GH₵ '+n.toLocaleString();}
+/* ============================================================
+   PERSISTENCE (window.storage — shared across this artifact)
+   ============================================================ */
+async function loadState(){
+  try{ const c=await window.storage.get('ecs_clients_v4'); state.clients=JSON.parse(c.value); }
+  catch(e){ state.clients=seedClients(); await saveClients(); }
+  try{ const a=await window.storage.get('ecs_activity_v4'); state.activity=JSON.parse(a.value); }
+  catch(e){ state.activity=seedActivity(state.clients); await saveActivity(); }
+  try{ const r=await window.storage.get('ecs_records_v4'); state.records=JSON.parse(r.value); }
+  catch(e){ state.records=seedRecords(state.clients); await saveRecords(); }
+  try{ const cl=await window.storage.get('ecs_calls_v4'); state.calls=JSON.parse(cl.value); }
+  catch(e){ state.calls=seedCalls(state.records); await saveCalls(); }
+  try{ const d=await window.storage.get('ecs_outreach_v4'); state.dailyOutreach=JSON.parse(d.value); }
+  catch(e){ state.dailyOutreach=seedDailyOutreach(); await saveOutreach(); }
+  try{ const ml=await window.storage.get('ecs_msglib_v4'); state.messageLibrary=JSON.parse(ml.value); }
+  catch(e){ state.messageLibrary=seedMessageLibrary(); await saveMessageLibrary(); }
+}
+async function saveClients(){ try{ await window.storage.set('ecs_clients_v4', JSON.stringify(state.clients)); }catch(e){} }
+async function saveActivity(){ try{ await window.storage.set('ecs_activity_v4', JSON.stringify(state.activity)); }catch(e){} }
+async function saveRecords(){ try{ await window.storage.set('ecs_records_v4', JSON.stringify(state.records)); }catch(e){} }
+async function saveCalls(){ try{ await window.storage.set('ecs_calls_v4', JSON.stringify(state.calls)); }catch(e){} }
+async function saveOutreach(){ try{ await window.storage.set('ecs_outreach_v4', JSON.stringify(state.dailyOutreach)); }catch(e){} }
+async function saveMessageLibrary(){ try{ await window.storage.set('ecs_msglib_v4', JSON.stringify(state.messageLibrary)); }catch(e){} }
 
-function renderKPIs(){
-  const active=clients.filter(c=>c.status==='Active'||c.status==='Renewal Due');
+function addActivity(clientId,clientName,text){
+  state.activity.unshift({id:uid('ACT'),clientId,clientName,text,ts:Date.now()});
+  saveActivity();
+}
+function addRecordHistory(rec,text){
+  rec.history=rec.history||[];
+  rec.history.unshift({ts:Date.now(),text});
+}
+
+/* ============================================================
+   TOAST
+   ============================================================ */
+function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2400);}
+
+/* ============================================================
+   VIEW ROUTING
+   ============================================================ */
+function setView(v){
+  state.view=v;
+  ['landing','apply','dashboard'].forEach(x=>document.getElementById('view-'+x).classList.toggle('hidden',x!==v));
+  ['landing','apply','dashboard'].forEach(x=>document.getElementById('nav-'+x).classList.toggle('active',x===v));
+  if(v==='landing')renderLanding();
+  if(v==='apply')renderApply();
+  if(v==='dashboard')renderDashboard();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function setDashTab(t){ state.dashTab=t; state.selectedModuleId=null; renderDashboard(); }
+
+/* ============================================================
+   LANDING
+   ============================================================ */
+function renderLanding(){
+  const active=state.clients.filter(c=>c.stage==='Active'||c.stage==='Renewal Due');
   const mrr=active.reduce((s,c)=>s+c.monthly,0);
-  const avgDeal=Math.round(mrr/active.filter(c=>c.monthly>0).length);
-  const dueSoon=clients.filter(c=>{const days=Math.round((c.renewal-new Date())/86400000);return days>=0&&days<=45;}).length;
-  const enterprise=clients.filter(c=>c.tier==='Enterprise Command System').length;
-  document.getElementById('kpiGrid').innerHTML=`
-    <div class="kpi" style="--accent:var(--gold)"><div class="label">TOTAL PORTFOLIO MRR</div><div class="value">${fmtMoney(mrr)}</div><div class="sub">${active.length} active accounts</div></div>
-    <div class="kpi" style="--accent:var(--green)"><div class="label">TOTAL CLIENTS</div><div class="value">${clients.length}</div><div class="sub">across ${new Set(clients.map(c=>c.industry)).size} industries</div></div>
-    <div class="kpi" style="--accent:var(--purple)"><div class="label">ENTERPRISE TIER</div><div class="value">${enterprise}</div><div class="sub">flagship Command System deployments</div></div>
-    <div class="kpi" style="--accent:var(--blue)"><div class="label">AVG DEAL SIZE</div><div class="value">${fmtMoney(avgDeal)}</div><div class="sub">monthly, paying accounts</div></div>
-    <div class="kpi" style="--accent:var(--teal)"><div class="label">RENEWALS — 45D</div><div class="value">${dueSoon}</div><div class="sub">upcoming renewal window</div></div>
+  const totalBuild=active.reduce((s,c)=>s+c.contractValue,0);
+  document.getElementById('landingStats').innerHTML=[
+    {n:state.clients.length,l:'Enterprise accounts'},
+    {n:fmtMoney(mrr),l:'Portfolio MRR'},
+    {n:fmtMoney(totalBuild),l:'Cumulative contract value'},
+    {n:new Set(state.clients.map(c=>c.industry)).size,l:'Industries served'}
+  ].map(s=>`<div class="card stat"><div class="n">${s.n}</div><div class="l">${s.l}</div></div>`).join('');
+
+  document.getElementById('landingPillars').innerHTML=MODULES.map(m=>`
+    <div class="card pillar-card"><div class="ic">${m.icon}</div><h3>${m.title}</h3><p>${m.desc}</p></div>`).join('');
+
+  document.getElementById('landingPricing').innerHTML=state.tiers.map((t,i)=>`
+    <div class="card price-card ${t.key==='flagship'?'flagship':''}">
+      <div class="tag">${t.key==='flagship'?'Flagship':'Tier '+(i+1)}</div>
+      <div class="amt">${fmtMoney(t.build)}</div>
+      <div class="amt2">one-time build + ${fmtMoney(t.monthly)}/mo retainer</div>
+      <ul><li>${t.name}</li><li>${t.blurb}</li></ul>
+    </div>`).join('');
+}
+
+/* ============================================================
+   APPLY FORM
+   ============================================================ */
+function renderApply(){
+  document.getElementById('applyForm').classList.remove('hidden');
+  document.getElementById('applySuccess').classList.add('hidden');
+  document.getElementById('applyErr').textContent='';
+  const indSel=document.getElementById('ap_industry');
+  const regSel=document.getElementById('ap_region');
+  const tierSel=document.getElementById('ap_tier');
+  if(!indSel.options.length)indSel.innerHTML=INDUSTRIES.map(i=>`<option>${i}</option>`).join('');
+  if(!regSel.options.length)regSel.innerHTML=REGIONS.map(r=>`<option>${r}</option>`).join('');
+  if(!tierSel.options.length)tierSel.innerHTML=state.tiers.map(t=>`<option value="${t.key}">${t.name} — ${fmtMoney(t.build)} + ${fmtMoney(t.monthly)}/mo</option>`).join('');
+  ['ap_name','ap_contact','ap_number'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('ap_notes').value='';
+}
+let lastLeadId=null;
+async function submitApplication(){
+  const name=document.getElementById('ap_name').value.trim();
+  const industry=document.getElementById('ap_industry').value;
+  const region=document.getElementById('ap_region').value;
+  const contact=document.getElementById('ap_contact').value.trim();
+  const number=document.getElementById('ap_number').value.trim();
+  const tierKey=document.getElementById('ap_tier').value;
+  const notes=document.getElementById('ap_notes').value.trim();
+  const err=document.getElementById('applyErr');
+  if(!name||!contact||!number){ err.textContent='Business alias, contact name, and contact number are required.'; return; }
+  const tier=state.tiers.find(t=>t.key===tierKey)||state.tiers[0];
+  const c={
+    id:uid('ECS'),name,industry,region,tierKey:tier.key,stage:'Prospect',
+    contractValue:tier.build,monthly:tier.monthly,health:70,
+    renewal:new Date(Date.now()+365*86400000).toISOString(),created:new Date().toISOString(),
+    modules:[],notes:notes,contactName:contact,contactNumber:number
+  };
+  state.clients.unshift(c);
+  await saveClients();
+  addActivity(c.id,c.name,'New application received — logged as Prospect, interested in '+tier.name+'.');
+  lastLeadId=c.id;
+  document.getElementById('applyForm').classList.add('hidden');
+  document.getElementById('applySuccess').classList.remove('hidden');
+  document.getElementById('applySuccessDetail').textContent=name+' — '+tier.name+' ('+fmtMoney(tier.build)+' + '+fmtMoney(tier.monthly)+'/mo) — now visible in Pipeline.';
+  showToast('Application logged — '+name);
+}
+function goToNewLead(){
+  state.pipelineHighlight=lastLeadId;
+  setView('dashboard');
+  setDashTab('pipeline');
+}
+
+/* ============================================================
+   DASHBOARD SHELL
+   ============================================================ */
+const DASH_TABS=[
+  {id:'overview',label:'OVERVIEW'},
+  {id:'pipeline',label:'PIPELINE'},
+  {id:'clients',label:'CLIENTS'},
+  {id:'modules',label:'DEPARTMENTS'},
+  {id:'outreach',label:'DAILY OUTREACH'},
+  {id:'revenue',label:'REVENUE'},
+  {id:'activity',label:'ACTIVITY LOG'},
+  {id:'archive',label:'ARCHIVE'},
+  {id:'addclient',label:'+ ADD CLIENT'},
+  {id:'settings',label:'PRICING / SETTINGS'},
+  {id:'docs',label:'📖 DOCUMENTATION'}
+];
+function renderDashboard(){
+  document.getElementById('dashTabs').innerHTML=DASH_TABS.map(t=>`<button class="${t.id===state.dashTab?'active':''}" onclick="setDashTab('${t.id}')">${t.label}</button>`).join('');
+  const body=document.getElementById('dashBody');
+  if(state.dashTab==='overview')body.innerHTML=renderOverview();
+  else if(state.dashTab==='pipeline')body.innerHTML=renderPipeline();
+  else if(state.dashTab==='clients')body.innerHTML=renderClientsTab();
+  else if(state.dashTab==='modules')body.innerHTML=renderModulesTab();
+  else if(state.dashTab==='outreach')body.innerHTML=renderOutreachTab();
+  else if(state.dashTab==='revenue')body.innerHTML=renderRevenueTab();
+  else if(state.dashTab==='activity')body.innerHTML=renderActivityTab();
+  else if(state.dashTab==='archive')body.innerHTML=renderGlobalArchiveTab();
+  else if(state.dashTab==='addclient')body.innerHTML=renderAddClientTab();
+  else if(state.dashTab==='settings')body.innerHTML=renderSettingsTab();
+  else if(state.dashTab==='docs')body.innerHTML=renderDocsTab();
+  wireDashInputs();
+}
+
+/* ---------- OVERVIEW ---------- */
+function renderOverview(){
+  const active=state.clients.filter(c=>c.stage==='Active'||c.stage==='Renewal Due');
+  const mrr=active.reduce((s,c)=>s+c.monthly,0);
+  const buildValue=active.reduce((s,c)=>s+c.contractValue,0);
+  const prospects=state.clients.filter(c=>c.stage==='Prospect').length;
+  const dueSoon=state.clients.filter(c=>{const d=Math.round((new Date(c.renewal)-new Date())/86400000);return d>=0&&d<=45;}).length;
+  const avgDeal=active.length?Math.round(buildValue/active.length):0;
+
+  const byTier={};
+  active.forEach(c=>{ byTier[c.tierKey]=(byTier[c.tierKey]||0)+c.monthly; });
+  const maxTier=Math.max(1,...Object.values(byTier));
+
+  const msgsToday=state.dailyOutreach.filter(o=>isToday(o.ts)).length;
+  const followupsDueToday=state.records.filter(r=>r.stage!=='Resolved'&&r.stage!=='Rejected'&&r.nextFollowUp<=todayStr()).length;
+  const callsToday=state.calls.filter(c=>isToday(c.ts)).length;
+
+  return `
+    <div class="kpi-grid">
+      <div class="kpi" style="--accent:var(--gold)"><div class="label">PORTFOLIO MRR</div><div class="value">${fmtMoney(mrr)}</div><div class="sub">${active.length} active accounts</div></div>
+      <div class="kpi" style="--accent:var(--green)"><div class="label">CUMULATIVE CONTRACT VALUE</div><div class="value" style="font-size:19px">${fmtMoney(buildValue)}</div><div class="sub">one-time build value, active book</div></div>
+      <div class="kpi" style="--accent:var(--blue)"><div class="label">PROSPECTS IN PIPELINE</div><div class="value">${prospects}</div><div class="sub">awaiting onboarding</div></div>
+      <div class="kpi" style="--accent:var(--purple)"><div class="label">AVG CONTRACT SIZE</div><div class="value" style="font-size:19px">${fmtMoney(avgDeal)}</div><div class="sub">per active client</div></div>
+      <div class="kpi" style="--accent:var(--teal)"><div class="label">RENEWALS — 45D</div><div class="value">${dueSoon}</div><div class="sub">upcoming renewal window</div></div>
+    </div>
+    <div class="kpi-grid">
+      <div class="kpi" style="--accent:var(--orange)"><div class="label">MESSAGES SENT TODAY</div><div class="value">${msgsToday}</div><div class="sub">${state.dailyOutreach.length} all-time — see Daily Outreach</div></div>
+      <div class="kpi" style="--accent:var(--gold)"><div class="label">FOLLOW-UPS DUE TODAY</div><div class="value">${followupsDueToday}</div><div class="sub">across all 7 departments</div></div>
+      <div class="kpi" style="--accent:var(--blue)"><div class="label">CALLS LOGGED TODAY</div><div class="value">${callsToday}</div><div class="sub">see any department → Calls</div></div>
+    </div>
+    <div class="grid-2">
+      <div class="card">
+        <div class="section-title" style="margin-top:0">MRR by tier</div>
+        <div class="bar-wrap">${state.tiers.map(t=>{const v=byTier[t.key]||0;return `<div class="bar-group"><div class="mono" style="font-size:9px;color:var(--gold)">${v>=1000?(v/1000).toFixed(0)+'k':v}</div><div class="bar" style="height:${Math.max(6,Math.round((v/maxTier)*110))}px"></div><div class="bar-vlabel">${t.name}</div></div>`;}).join('')}</div>
+      </div>
+      <div class="card">
+        <div class="section-title" style="margin-top:0">Recent activity</div>
+        ${state.activity.slice(0,8).map(a=>`<div class="activity-item"><div class="dot" style="background:var(--gold)"></div><div style="flex:1"><a onclick="openClient('${a.clientId}')" style="cursor:pointer">${a.clientName}</a> — ${a.text}</div></div>`).join('')}
+      </div>
+    </div>
+    <div class="section-title">Department load — records currently open, by region breakdown available inside each department</div>
+    <div class="module-grid">
+      ${MODULES.map(m=>{const open=state.records.filter(r=>r.module===m.id&&r.stage!=='Resolved'&&r.stage!=='Rejected').length;const due=state.records.filter(r=>r.module===m.id&&r.stage!=='Resolved'&&r.stage!=='Rejected'&&r.nextFollowUp<=todayStr()).length;return `<div class="card module-card" onclick="setDashTab('modules');openModule('${m.id}')"><div class="ic" style="font-size:20px">${m.icon}</div><div style="font-size:12px;font-weight:700;color:var(--gold);margin-top:6px">${m.title}</div><div class="count">${open}</div><div style="font-size:9px;color:var(--muted)">open items · ${due} due today</div></div>`;}).join('')}
+    </div>
   `;
 }
 
-const PILLARS=[
-  {ic:'🌐',t:'Digital Presence',s:'Website · SEO · Content'},
-  {ic:'📦',t:'Operations',s:'Stock · Payroll · Procurement'},
-  {ic:'📱',t:'Customer Experience',s:'QR Ordering · Membership'},
-  {ic:'📊',t:'Management',s:'Executive Dashboard · KPIs'},
-  {ic:'🧰',t:'Facilities',s:'Maintenance · Asset Tracking'},
-  {ic:'🎓',t:'Training',s:'SOPs · Staff Guides'},
-  {ic:'🛟',t:'Support',s:'Updates · Consultation'}
-];
-function renderPillars(){document.getElementById('pillarsGrid').innerHTML=PILLARS.map(p=>`<div class="pillar"><div class="ic">${p.ic}</div><div class="t">${p.t}</div><div class="s">${p.s}</div></div>`).join('');}
-
-function renderRevChart(){
-  const byTier={};
-  clients.forEach(c=>{if(c.monthly>0)byTier[c.tier]=(byTier[c.tier]||0)+c.monthly;});
-  const entries=Object.entries(byTier).sort((a,b)=>b[1]-a[1]);
-  const max=Math.max(...entries.map(e=>e[1]));
-  document.getElementById('revChart').innerHTML=entries.map(([name,val])=>`
-    <div class="bar-group">
-      <div style="font-size:9px;color:var(--gold);font-family:'Space Mono',monospace">${val>=1000?(val/1000).toFixed(1)+'k':val}</div>
-      <div class="bar" style="height:${Math.max(6,Math.round((val/max)*110))}px"></div>
-      <div class="bar-label" style="writing-mode:vertical-rl;text-orientation:mixed;height:60px">${name}</div>
-    </div>`).join('');
+/* ---------- PIPELINE ---------- */
+function renderPipeline(){
+  const cols=['Prospect','Onboarding','Active','Renewal Due','Paused','Churned'];
+  return `<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px">
+    ${cols.map(stage=>{
+      const items=state.clients.filter(c=>c.stage===stage);
+      return `<div class="card" style="border-top:2px solid ${STAGE_COLOR[stage]}">
+        <div style="font-size:11px;font-weight:700;letter-spacing:1px;color:${STAGE_COLOR[stage]};margin-bottom:10px">${stage.toUpperCase()} (${items.length})</div>
+        ${items.slice(0,25).map(c=>`<div class="card" style="padding:10px;margin-bottom:8px;${c.id===state.pipelineHighlight?'border-color:var(--gold)':''};cursor:pointer" onclick="openClient('${c.id}')">
+          <div style="font-size:11px;font-weight:700">${c.name}</div>
+          <div style="font-size:10px;color:var(--muted);margin-top:3px">${c.industry} · ${c.region||''}</div>
+          <div class="mono" style="font-size:10px;color:var(--gold);margin-top:5px">${fmtMoney(c.contractValue)}</div>
+        </div>`).join('')||'<div style="font-size:11px;color:var(--muted)">Empty</div>'}
+      </div>`;
+    }).join('')}
+  </div>`;
 }
 
-const ACTIVITY_TEMPLATES=[
-  'moved to Active after onboarding call',
-  'renewed for another 12 months',
-  'upgraded from Verified to Visibility Partner',
-  'monthly report generated and delivered',
-  'flagged as Renewal Due — outreach scheduled',
-  'new SME Systems deployment completed',
-  'Enterprise Command System check-in logged',
-  'facilities ticket resolved and closed',
-  'payroll cycle processed automatically',
-  'new lead converted from portfolio referral'
+/* ---------- CLIENTS TABLE ---------- */
+let clientFilter='ALL', clientRegionFilter='ALL', clientSearch='';
+function renderClientsTab(){
+  return `
+    <input class="search-input" id="clientSearchInput" placeholder="Search by name, industry, region, stage..." value="${clientSearch}" style="margin-bottom:12px" oninput="clientSearch=this.value;renderInto()">
+    <div class="filter-row" id="clientFilterRow">${['ALL',...STAGES].map(s=>`<button class="filter-btn ${clientFilter===s?'active':''}" onclick="clientFilter='${s}';renderInto()">${s}</button>`).join('')}</div>
+    <div class="filter-row">${['ALL',...REGIONS].map(r=>`<button class="filter-btn ${clientRegionFilter===r?'active':''}" onclick="clientRegionFilter='${r}';renderInto()">${r}</button>`).join('')}</div>
+    <div class="card"><div class="scroll-table"><table>
+      <thead><tr><th>ID</th><th>Client</th><th>Industry</th><th>Region</th><th>Stage</th><th>Tier</th><th>MRR</th><th>Contract Value</th><th>Health</th></tr></thead>
+      <tbody id="clientsBody"></tbody>
+    </table></div></div>
+  `;
+}
+function renderClientsBody(){
+  const tbody=document.getElementById('clientsBody');
+  if(!tbody)return;
+  const q=clientSearch.toLowerCase();
+  let list=state.clients.filter(c=>(clientFilter==='ALL'||c.stage===clientFilter)&&(clientRegionFilter==='ALL'||c.region===clientRegionFilter));
+  if(q)list=list.filter(c=>c.name.toLowerCase().includes(q)||c.industry.toLowerCase().includes(q)||(c.region||'').toLowerCase().includes(q)||c.stage.toLowerCase().includes(q));
+  tbody.innerHTML=list.map(c=>{
+    const tier=state.tiers.find(t=>t.key===c.tierKey)||state.tiers[0];
+    return `<tr class="rowlink" onclick="openClient('${c.id}')">
+      <td class="mono" style="color:var(--muted)">${c.id}</td>
+      <td>${c.name}</td><td>${c.industry}</td><td style="color:var(--text-dim)">${c.region}</td>
+      <td><span class="pill" style="background:${STAGE_COLOR[c.stage]}22;color:${STAGE_COLOR[c.stage]};border:1px solid ${STAGE_COLOR[c.stage]}">${c.stage}</span></td>
+      <td style="font-size:10px">${tier.name}</td>
+      <td class="mono" style="color:var(--gold)">${fmtMoney(c.monthly)}</td>
+      <td class="mono">${fmtMoney(c.contractValue)}</td>
+      <td class="mono" style="color:${c.health>80?'var(--green)':c.health>65?'var(--gold)':'var(--red)'}">${c.health}</td>
+    </tr>`;
+  }).join('')||'<tr><td colspan="9" style="text-align:center;padding:20px;color:var(--muted)">No matching clients</td></tr>';
+}
+
+/* ============================================================
+   DEPARTMENTS (MODULES) — each with its own full workspace:
+   Overview, Pipeline, Follow-Ups, Calls, Messages, Archive, Docs
+   ============================================================ */
+function renderModulesTab(){
+  if(state.selectedModuleId)return renderModuleWorkspace(state.selectedModuleId);
+  return `<div class="module-grid">${MODULES.map(m=>{
+    const recs=state.records.filter(r=>r.module===m.id);
+    const open=recs.filter(r=>r.stage!=='Resolved'&&r.stage!=='Rejected').length;
+    const due=recs.filter(r=>r.stage!=='Resolved'&&r.stage!=='Rejected'&&r.nextFollowUp<=todayStr()).length;
+    return `<div class="card module-card" onclick="openModule('${m.id}')">
+      <div style="font-size:22px">${m.icon}</div>
+      <div style="font-size:13px;font-weight:700;color:var(--gold);margin-top:8px">${m.title}</div>
+      <div style="font-size:11px;color:var(--muted);margin-top:4px;line-height:1.6">${m.desc}</div>
+      <div class="count">${open}<span style="font-size:11px;color:var(--muted);font-weight:400"> open / ${recs.length} total</span></div>
+      <div style="font-size:9px;color:${due>0?'var(--gold)':'var(--muted)'};margin-top:4px">${due} follow-up${due===1?'':'s'} due today</div>
+    </div>`;
+  }).join('')}</div>`;
+}
+function openModule(id){ state.selectedModuleId=id; state.moduleTab='overview'; setDashTabQuiet('modules'); renderDashboard(); }
+function setDashTabQuiet(t){ state.dashTab=t; }
+function setModuleTab(tab){ state.moduleTab=tab; renderDashboard(); }
+function backToModules(){ state.selectedModuleId=null; renderDashboard(); }
+
+const MODULE_SUBTABS=[
+  {id:'overview',label:'OVERVIEW'},
+  {id:'pipeline',label:'PIPELINE'},
+  {id:'followups',label:'FOLLOW-UPS'},
+  {id:'calls',label:'CALLS'},
+  {id:'messages',label:'MESSAGES'},
+  {id:'archive',label:'ARCHIVE'},
+  {id:'docs',label:'📖 DOCS'}
 ];
-function renderActivity(){
-  const items=[];
-  for(let i=0;i<10;i++){
-    const c=pick(clients);
-    const mins=randInt(4,720);
-    items.push({text:c.id+' ('+c.industry+') — '+pick(ACTIVITY_TEMPLATES),color:c.statusColor,mins});
+function renderModuleWorkspace(id){
+  const m=MODULES.find(x=>x.id===id);
+  const recs=state.records.filter(r=>r.module===id);
+  let body='';
+  if(state.moduleTab==='overview')body=renderModOverview(m,recs);
+  else if(state.moduleTab==='pipeline')body=renderModPipeline(m,recs);
+  else if(state.moduleTab==='followups')body=renderModFollowUps(m,recs);
+  else if(state.moduleTab==='calls')body=renderModCalls(m,recs);
+  else if(state.moduleTab==='messages')body=renderModMessages(m);
+  else if(state.moduleTab==='archive')body=renderModArchive(m,recs);
+  else if(state.moduleTab==='docs')body=renderModDocs(m);
+  return `
+    <button class="btn btn-ghost btn-sm" onclick="backToModules()">← All departments</button>
+    <div style="margin:14px 0"><span style="font-size:20px">${m.icon}</span> <span style="font-size:17px;font-weight:800;vertical-align:middle">${m.title}</span> <span style="font-size:11px;color:var(--muted)">— ${m.desc}</span></div>
+    <div class="modtabs">${MODULE_SUBTABS.map(t=>`<button class="${state.moduleTab===t.id?'active':''}" onclick="setModuleTab('${t.id}')">${t.label}</button>`).join('')}</div>
+    <div>${body}</div>
+  `;
+}
+
+/* ---- module: overview ---- */
+function renderModOverview(m,recs){
+  const open=recs.filter(r=>r.stage!=='Resolved'&&r.stage!=='Rejected');
+  const due=recs.filter(r=>r.stage!=='Resolved'&&r.stage!=='Rejected'&&r.nextFollowUp<=todayStr());
+  const archived=recs.filter(r=>r.stage==='Rejected'||r.archived);
+  const msgsToday=state.dailyOutreach.filter(o=>isToday(o.ts)).length; // shared counter across departments
+  const callsForModule=state.calls.filter(c=>c.module===m.id);
+  const byRegion={};
+  recs.forEach(r=>{byRegion[r.region||'—']=(byRegion[r.region||'—']||0)+1;});
+  const bySignal={};
+  open.forEach(r=>{bySignal[r.waSignal]=(bySignal[r.waSignal]||0)+1;});
+  return `
+    <div class="kpi-grid">
+      <div class="kpi" style="--accent:var(--gold)"><div class="label">TOTAL RECORDS</div><div class="value">${recs.length}</div><div class="sub">${open.length} currently open</div></div>
+      <div class="kpi" style="--accent:var(--orange)"><div class="label">FOLLOW-UPS DUE TODAY</div><div class="value">${due.length}</div><div class="sub">see Follow-Ups tab</div></div>
+      <div class="kpi" style="--accent:var(--blue)"><div class="label">CALLS LOGGED</div><div class="value">${callsForModule.length}</div><div class="sub">this department, all-time</div></div>
+      <div class="kpi" style="--accent:var(--muted)"><div class="label">ARCHIVED / REJECTED</div><div class="value">${archived.length}</div><div class="sub">see Archive tab</div></div>
+    </div>
+    <div class="grid-2">
+      <div class="card">
+        <div class="section-title" style="margin-top:0">By region</div>
+        <table><thead><tr><th>Region</th><th>Records</th></tr></thead><tbody>
+        ${Object.keys(byRegion).map(r=>`<tr><td>${r}</td><td class="mono">${byRegion[r]}</td></tr>`).join('')||'<tr><td colspan="2" style="color:var(--muted)">No records yet</td></tr>'}
+        </tbody></table>
+      </div>
+      <div class="card">
+        <div class="section-title" style="margin-top:0">By signal (open records)</div>
+        ${SIGNALS.filter(s=>s.key!=='rejected').map(s=>`<div class="activity-item"><span class="sig-pill" style="color:${s.color}">${s.icon} ${s.name}</span><span style="margin-left:auto;font-weight:700">${bySignal[s.key]||0}</span></div>`).join('')}
+      </div>
+    </div>
+    <div class="section-title">Danger zone</div>
+    <div class="card" style="border-color:var(--red)">
+      <div style="font-size:12px;color:var(--text-dim);margin-bottom:10px">Clear every record in ${m.title} — this cannot be undone from here (records will still exist for other departments).</div>
+      <button class="btn btn-red btn-sm" onclick="clearModuleRecords('${m.id}')">🗑 Clear all ${m.title} records</button>
+    </div>
+  `;
+}
+async function clearModuleRecords(moduleId){
+  if(!confirm('Clear ALL records for this department? This cannot be undone.'))return;
+  state.records=state.records.filter(r=>r.module!==moduleId);
+  await saveRecords();
+  showToast('Department records cleared');
+  renderDashboard();
+}
+
+/* ---- module: pipeline (kanban) ---- */
+function renderModPipeline(m,recs){
+  const visible=MODULE_STAGES.filter(s=>s!=='Rejected');
+  return `
+    <div class="doc-note">Click any card to open the full record — change stage, set the WhatsApp-style signal, region, next follow-up date, and log notes.</div>
+    <button class="btn btn-primary btn-sm" style="margin-bottom:12px" onclick="openNewRecordModal('${m.id}')">+ Add ${m.label}</button>
+    <div class="kanban">
+      ${visible.map(stage=>{
+        const items=recs.filter(r=>r.stage===stage);
+        return `<div class="kcol" style="--accent:${STAGE_COLOR2[stage]}">
+          <div class="khead">${stage.toUpperCase()} (${items.length})</div>
+          ${items.map(r=>`<div class="kcard" onclick="openRecordModal('${r.id}')">
+            <div class="kc-title">${r.title}</div>
+            <div class="kc-sub">${r.clientName} · ${r.region||'—'}</div>
+            <div style="margin-top:6px"><span class="sig-pill" style="color:${signalFor(r.waSignal).color}">${signalFor(r.waSignal).icon}</span></div>
+          </div>`).join('')||'<div style="font-size:10px;color:var(--muted)">Empty</div>'}
+        </div>`;
+      }).join('')}
+    </div>
+  `;
+}
+function openNewRecordModal(moduleId){
+  const m=MODULES.find(x=>x.id===moduleId);
+  document.getElementById('modalRoot').innerHTML=`
+    <div class="overlay" onclick="if(event.target===this)closeModal()">
+      <div class="modal">
+        <div class="modal-head"><div style="font-size:16px;font-weight:800">+ Add ${m.label}</div><button class="modal-close" onclick="closeModal()">✕</button></div>
+        <label>Client</label><select id="nr_client">${state.clients.map(c=>`<option value="${c.id}">${c.name}</option>`).join('')}</select>
+        <label>Region</label><select id="nr_region">${REGIONS.map(r=>`<option>${r}</option>`).join('')}</select>
+        <label>Title</label><input id="nr_title" placeholder="${m.label}">
+        <label>Detail</label><textarea id="nr_detail" rows="2" placeholder="What's happening on this item"></textarea>
+        <label>Next follow-up</label><input id="nr_fu" type="date" value="${todayStr()}">
+        <button class="btn btn-primary" style="margin-top:12px;width:100%;justify-content:center" onclick="createRecord('${moduleId}')">+ Create record</button>
+      </div>
+    </div>`;
+}
+async function createRecord(moduleId){
+  const clientId=document.getElementById('nr_client').value;
+  const region=document.getElementById('nr_region').value;
+  const title=document.getElementById('nr_title').value.trim();
+  const detail=document.getElementById('nr_detail').value.trim();
+  const fu=document.getElementById('nr_fu').value||todayStr();
+  if(!title){ showToast('Add a title first'); return; }
+  const client=state.clients.find(c=>c.id===clientId);
+  const rec={id:uid('REC'),module:moduleId,clientId,clientName:client?client.name:'—',region,
+    title,detail:detail||'—',stage:'New',waSignal:'unread',archived:false,
+    nextFollowUp:fu,notes:'',history:[{ts:Date.now(),text:'Record created.'}],ts:Date.now()};
+  state.records.unshift(rec);
+  await saveRecords();
+  addActivity(clientId,rec.clientName,'New '+MODULES.find(mm=>mm.id===moduleId).label.toLowerCase()+' logged: '+title);
+  showToast('Record added');
+  closeModal();
+  renderDashboard();
+}
+
+/* ---- record detail modal (shared by all departments) ---- */
+function openRecordModal(id){
+  const r=state.records.find(x=>x.id===id);
+  if(!r)return;
+  state.selectedRecordId=id;
+  const m=MODULES.find(x=>x.id===r.module);
+  const client=state.clients.find(c=>c.id===r.clientId);
+  const lib=(state.messageLibrary[r.module]||{});
+  const allTemplates=[].concat(lib.cold||[],lib.followup||[],lib.objections||[]);
+  document.getElementById('modalRoot').innerHTML=`
+    <div class="overlay" onclick="if(event.target===this)closeModal()">
+      <div class="modal">
+        <div class="modal-head">
+          <div><div style="font-size:16px;font-weight:800">${r.title}</div><div style="font-size:11px;color:var(--muted);margin-top:3px">${m.icon} ${m.title} · ${r.clientName} · ${r.id}</div></div>
+          <button class="modal-close" onclick="closeModal()">✕</button>
+        </div>
+        <div class="detail-grid">
+          <div><div class="k">Stage</div><select onchange="updateRecordField('${r.id}','stage',this.value)">${MODULE_STAGES.map(s=>`<option ${s===r.stage?'selected':''}>${s}</option>`).join('')}</select></div>
+          <div><div class="k">WhatsApp signal</div><select onchange="updateRecordField('${r.id}','waSignal',this.value)">${SIGNALS.map(s=>`<option value="${s.key}" ${s.key===r.waSignal?'selected':''}>${s.icon} ${s.name}</option>`).join('')}</select></div>
+          <div><div class="k">Region</div><select onchange="updateRecordField('${r.id}','region',this.value)">${REGIONS.map(rg=>`<option ${rg===r.region?'selected':''}>${rg}</option>`).join('')}</select></div>
+          <div><div class="k">Next follow-up</div><input type="date" value="${r.nextFollowUp||''}" onchange="updateRecordField('${r.id}','nextFollowUp',this.value)"></div>
+        </div>
+        <div class="k">Detail</div><div class="v" style="font-size:12px;color:var(--text-dim);margin-bottom:10px">${escapeHtml(r.detail)}</div>
+        <div class="k">Notes</div>
+        <textarea id="rec_notes" rows="2">${r.notes||''}</textarea>
+        <button class="btn btn-ghost btn-sm" style="margin-top:6px" onclick="saveRecordNote('${r.id}')">Save note</button>
+
+        <div class="section-title">Quick message</div>
+        <select id="rec_msg_pick" style="margin-bottom:8px">${allTemplates.map(t=>`<option value="${t.id}">${t.title}</option>`).join('')||'<option>No templates yet</option>'}</select>
+        <textarea id="rec_msg_body" rows="3">${allTemplates[0]?personalize(allTemplates[0].body,client,r):''}</textarea>
+        <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap">
+          <button class="btn btn-ghost btn-sm" onclick="pickTemplateInto('${r.id}')">Load selected</button>
+          <button class="btn btn-ghost btn-sm" onclick="copyText(document.getElementById('rec_msg_body').value)">Copy</button>
+          <a class="btn btn-green btn-sm" href="${waLink(client?client.contactNumber:'','')}" onclick="event.preventDefault();window.open(waLink(client?client.contactNumber:'',document.getElementById('rec_msg_body').value),'_blank');logOutreach('${r.id}')">WhatsApp</a>
+          <button class="btn btn-blue btn-sm" onclick="logOutreach('${r.id}')">Log as sent</button>
+        </div>
+
+        <div class="section-title">History</div>
+        ${(r.history||[]).map(h=>`<div class="timeline-item">${h.text} <span style="color:var(--muted);font-size:10px">· ${fmtDate(h.ts)}</span></div>`).join('')||'<div style="font-size:11px;color:var(--muted)">No history yet.</div>'}
+      </div>
+    </div>
+  `;
+}
+function pickTemplateInto(recId){
+  const r=state.records.find(x=>x.id===recId);
+  const client=state.clients.find(c=>c.id===r.clientId);
+  const lib=(state.messageLibrary[r.module]||{});
+  const all=[].concat(lib.cold||[],lib.followup||[],lib.objections||[]);
+  const id=document.getElementById('rec_msg_pick').value;
+  const t=all.find(x=>x.id===id);
+  if(t)document.getElementById('rec_msg_body').value=personalize(t.body,client,r);
+}
+async function updateRecordField(id,field,value){
+  const r=state.records.find(x=>x.id===id);
+  if(!r)return;
+  const old=r[field];
+  r[field]=value;
+  if(field==='stage'&&value==='Rejected')r.archived=true;
+  if(field==='stage'&&value!=='Rejected')r.archived=false;
+  addRecordHistory(r,field+' changed from "'+old+'" to "'+value+'"');
+  await saveRecords();
+  addActivity(r.clientId,r.clientName,m_label(r.module)+' "'+r.title+'": '+field+' → '+value);
+  showToast('Updated');
+  renderDashboard();
+  if(document.getElementById('modalRoot').innerHTML)openRecordModal(id);
+}
+function m_label(moduleId){ const m=MODULES.find(x=>x.id===moduleId); return m?m.title:moduleId; }
+async function saveRecordNote(id){
+  const r=state.records.find(x=>x.id===id);
+  if(!r)return;
+  r.notes=document.getElementById('rec_notes').value;
+  addRecordHistory(r,'Note updated');
+  await saveRecords();
+  showToast('Note saved');
+}
+async function logOutreach(recId){
+  const r=state.records.find(x=>x.id===recId);
+  state.dailyOutreach.unshift({id:uid('OUT'),note:r?('Message re: '+r.title):'WhatsApp message',ts:Date.now()});
+  await saveOutreach();
+  if(r){ addRecordHistory(r,'Message logged as sent.'); await saveRecords(); addActivity(r.clientId,r.clientName,'Message sent re: '+r.title); }
+  showToast('Logged in Daily Outreach');
+}
+function closeModal(){ document.getElementById('modalRoot').innerHTML=''; state.selectedRecordId=null; }
+
+/* ---- module: follow-ups ---- */
+function renderModFollowUps(m,recs){
+  const due=recs.filter(r=>r.stage!=='Resolved'&&r.stage!=='Rejected'&&r.nextFollowUp<=todayStr()).sort((a,b)=>a.nextFollowUp.localeCompare(b.nextFollowUp));
+  const lib=(state.messageLibrary[m.id]||{});
+  const fuTemplate=(lib.followup&&lib.followup[0])||(lib.cold&&lib.cold[0]);
+  return `
+    <div class="doc-note">Showing every ${m.title} record due today or overdue. Advance to Done, snooze to a new date, or reject — rejected items move to Archive automatically.</div>
+    <div style="font-size:11px;color:var(--muted);margin-bottom:10px">${due.length} due today</div>
+    ${due.map(r=>{
+      const client=state.clients.find(c=>c.id===r.clientId);
+      const body=fuTemplate?personalize(fuTemplate.body,client,r):'';
+      return `<div class="followup-row">
+        <div class="fu-head">
+          <div><b>${r.title}</b> <span style="color:var(--muted);font-size:11px">— ${r.clientName} · ${r.region||'—'}</span></div>
+          <span class="pill" style="background:${STAGE_COLOR2[r.stage]}22;color:${STAGE_COLOR2[r.stage]};border:1px solid ${STAGE_COLOR2[r.stage]}">${r.stage}</span>
+        </div>
+        <textarea rows="2" id="fu_body_${r.id}">${escapeHtml(body)}</textarea>
+        <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap">
+          <button class="btn btn-ghost btn-sm" onclick="copyText(document.getElementById('fu_body_${r.id}').value)">Copy</button>
+          <button class="btn btn-green btn-sm" onclick="window.open(waLink('${client?client.contactNumber:''}',document.getElementById('fu_body_${r.id}').value),'_blank');logOutreach('${r.id}')">WhatsApp</button>
+          <button class="btn btn-blue btn-sm" onclick="advanceFollowUp('${r.id}')">✓ Done — advance stage</button>
+          <button class="btn btn-ghost btn-sm" onclick="snoozeFollowUp('${r.id}')">Snooze 3 days</button>
+          <button class="btn btn-red btn-sm" onclick="rejectRecord('${r.id}')">✕ Reject</button>
+        </div>
+      </div>`;
+    }).join('')||'<div class="card" style="color:var(--muted);text-align:center">No follow-ups due today — good work!</div>'}
+  `;
+}
+async function advanceFollowUp(id){
+  const r=state.records.find(x=>x.id===id);
+  if(!r)return;
+  const order=MODULE_STAGES;
+  const idx=order.indexOf(r.stage);
+  r.stage= idx<order.length-3 ? order[idx+1] : 'Resolved';
+  addRecordHistory(r,'Advanced to '+r.stage+' via follow-up.');
+  await saveRecords();
+  addActivity(r.clientId,r.clientName,m_label(r.module)+' "'+r.title+'" advanced to '+r.stage);
+  showToast('Advanced to '+r.stage);
+  renderDashboard();
+}
+async function snoozeFollowUp(id){
+  const r=state.records.find(x=>x.id===id);
+  if(!r)return;
+  r.nextFollowUp=new Date(Date.now()+3*86400000).toISOString().slice(0,10);
+  addRecordHistory(r,'Snoozed follow-up by 3 days.');
+  await saveRecords();
+  showToast('Snoozed 3 days');
+  renderDashboard();
+}
+async function rejectRecord(id){
+  const r=state.records.find(x=>x.id===id);
+  if(!r)return;
+  r.stage='Rejected'; r.archived=true; r.waSignal='rejected';
+  addRecordHistory(r,'Marked Rejected — moved to Archive.');
+  await saveRecords();
+  addActivity(r.clientId,r.clientName,m_label(r.module)+' "'+r.title+'" rejected / archived');
+  showToast('Moved to Archive');
+  renderDashboard();
+}
+
+/* ---- module: calls ---- */
+function renderModCalls(m,recs){
+  const calls=state.calls.filter(c=>c.module===m.id).sort((a,b)=>b.ts-a.ts);
+  return `
+    <div class="doc-note">Log every phone call related to a ${m.title} record. Logging an outcome appends to that record's history automatically.</div>
+    <div class="card">
+      <label>Record</label>
+      <select id="call_record">${recs.map(r=>`<option value="${r.id}">${r.title} — ${r.clientName}</option>`).join('')||'<option value="">No records yet</option>'}</select>
+      <div class="form-row2">
+        <div><label>Outcome</label><select id="call_outcome"><option>Answered — resolved</option><option>Answered — interested</option><option>No answer</option><option>Wrong number</option><option>Call back later</option><option>Not interested</option></select></div>
+        <div><label>Next action</label><input id="call_next" placeholder="e.g. Send WhatsApp with update"></div>
+      </div>
+      <label>What happened on the call</label>
+      <textarea id="call_notes" rows="2" placeholder="e.g. Confirmed timeline, will follow up Thursday."></textarea>
+      <button class="btn btn-primary btn-sm" style="margin-top:10px" onclick="logCall('${m.id}')">📞 Log call</button>
+    </div>
+    <div class="section-title">Recent calls — ${m.title}</div>
+    ${calls.map(c=>`<div class="record-row"><div style="flex:1"><div style="font-weight:700;font-size:12px">${c.clientName}</div><div style="font-size:11px;color:var(--text-dim)">${c.outcome} — ${c.notes}</div><div style="font-size:9px;color:var(--muted);margin-top:2px">Next: ${c.nextAction||'—'}</div></div><div style="font-size:9px;color:var(--muted)">${fmtDate(c.ts)}</div></div>`).join('')||'<div style="color:var(--muted);font-size:12px">No calls logged yet.</div>'}
+  `;
+}
+async function logCall(moduleId){
+  const recordId=document.getElementById('call_record').value;
+  const outcome=document.getElementById('call_outcome').value;
+  const nextAction=document.getElementById('call_next').value.trim();
+  const notes=document.getElementById('call_notes').value.trim();
+  const r=state.records.find(x=>x.id===recordId);
+  const call={id:uid('CALL'),module:moduleId,recordId,clientId:r?r.clientId:null,clientName:r?r.clientName:'—',
+    outcome,notes:notes||'—',nextAction:nextAction||'—',ts:Date.now()};
+  state.calls.unshift(call);
+  await saveCalls();
+  if(r){ addRecordHistory(r,'Call logged: '+outcome+(notes?(' — '+notes):'')); await saveRecords(); addActivity(r.clientId,r.clientName,'Call logged on '+m_label(moduleId)+' item "'+r.title+'": '+outcome); }
+  showToast('Call logged');
+  renderDashboard();
+}
+
+/* ---- module: messages (library) ---- */
+function renderModMessages(m){
+  state.messageLibrary[m.id]=state.messageLibrary[m.id]||{cold:[],followup:[],objections:[]};
+  const lib=state.messageLibrary[m.id];
+  function block(cat,title){
+    return `<div class="section-title" style="margin-top:20px">${title}</div>
+    ${(lib[cat]||[]).map((t,i)=>`<div class="msg-card">
+      <h4>${t.title}</h4>
+      <textarea rows="2" onchange="updateMessageBody('${m.id}','${cat}',${i},this.value)">${escapeHtml(t.body)}</textarea>
+      <div style="margin-top:8px"><button class="btn btn-ghost btn-sm" onclick="copyText(this.previousElementSibling.previousElementSibling.value)">Copy</button></div>
+    </div>`).join('')}
+    <button class="btn btn-ghost btn-sm" onclick="addMessageTemplate('${m.id}','${cat}')">+ Add ${title.toLowerCase()} template</button>`;
   }
-  items.sort((a,b)=>a.mins-b.mins);
-  document.getElementById('activityFeed').innerHTML=items.map(it=>`
-    <div class="activity-item"><div class="activity-dot" style="background:${it.color}"></div>
-      <div style="flex:1">${it.text}</div>
-      <div style="color:var(--muted);white-space:nowrap">${it.mins<60?it.mins+'m ago':Math.round(it.mins/60)+'h ago'}</div>
-    </div>`).join('');
+  return `
+    <div class="doc-note">This is the ${m.title} message library — the exact wording staff use for cold outreach, follow-ups, and handling pushback on this department's items. Use {name}, {business}, {title}, {region} as placeholders; they auto-fill when a message is loaded from a record.</div>
+    ${block('cold','Cold / First Contact')}
+    ${block('followup','Follow-Up')}
+    ${block('objections','Objection Handling')}
+  `;
+}
+async function updateMessageBody(moduleId,cat,idx,value){
+  state.messageLibrary[moduleId][cat][idx].body=value;
+  await saveMessageLibrary();
+  showToast('Template updated');
+}
+async function addMessageTemplate(moduleId,cat){
+  state.messageLibrary[moduleId][cat].push({id:uid('MSG'),title:'New template',body:'Hi {name}, ...'});
+  await saveMessageLibrary();
+  renderDashboard();
 }
 
-let currentTierFilter='ALL';
-function renderTierFilters(){
-  const names=['ALL',...TIERS.map(t=>t.name)];
-  document.getElementById('tierFilters').innerHTML=names.map(n=>`<button class="filter-btn ${n===currentTierFilter?'active':''}" onclick="currentTierFilter='${n.replace(/'/g,"\\'")}';renderTierFilters();renderClients()">${n}</button>`).join('');
+/* ---- module: archive ---- */
+function renderModArchive(m,recs){
+  const archived=recs.filter(r=>r.stage==='Rejected'||r.archived);
+  return `
+    <div class="doc-note">Rejected or closed-out ${m.title} items. Nothing is deleted — restore any record back into the active pipeline as "New".</div>
+    ${archived.map(r=>`<div class="record-row">
+      <div style="flex:1"><div style="font-weight:700;font-size:12px">${r.title}</div><div style="font-size:11px;color:var(--text-dim)">${r.clientName} · ${r.region||'—'}</div></div>
+      <button class="btn btn-green btn-sm" onclick="restoreRecord('${r.id}')">↺ Restore to active pipeline</button>
+    </div>`).join('')||'<div style="color:var(--muted);font-size:12px">Nothing archived in this department.</div>'}
+  `;
+}
+async function restoreRecord(id){
+  const r=state.records.find(x=>x.id===id);
+  if(!r)return;
+  r.stage='New'; r.archived=false; r.waSignal='unread';
+  addRecordHistory(r,'Restored to active pipeline.');
+  await saveRecords();
+  addActivity(r.clientId,r.clientName,m_label(r.module)+' "'+r.title+'" restored from archive');
+  showToast('Restored');
+  renderDashboard();
 }
 
-function renderClients(){
-  const q=(document.getElementById('clientSearch').value||'').toLowerCase();
-  let f=clients.filter(c=>currentTierFilter==='ALL'||c.tier===currentTierFilter);
-  if(q)f=f.filter(c=>c.industry.toLowerCase().includes(q)||c.tier.toLowerCase().includes(q)||c.status.toLowerCase().includes(q)||c.region.toLowerCase().includes(q));
-  document.getElementById('clientBody').innerHTML=f.map(c=>`
-    <tr>
-      <td style="font-family:'Space Mono',monospace;color:var(--muted)">${c.id}</td>
-      <td>${c.industry}</td>
-      <td style="color:var(--text-dim)">${c.region}</td>
-      <td><span class="tier-badge" style="background:${c.tierColor}22;color:${c.tierColor};border:1px solid ${c.tierColor}">${c.tier}</span></td>
-      <td style="font-family:'Space Mono',monospace;color:var(--gold)">${c.monthly>0?fmtMoney(c.monthly):'Free tier'}</td>
-      <td><span class="status-dot" style="background:${c.statusColor}"></span>${c.status}</td>
-      <td style="font-size:11px;color:var(--text-dim)">${fmtDate(c.renewal)}</td>
-      <td style="font-family:'Space Mono',monospace;color:${c.health>80?'var(--green)':c.health>65?'var(--gold)':'var(--red)'}">${c.health}</td>
-    </tr>`).join('')||'<tr><td colspan="8" style="text-align:center;padding:20px;color:var(--muted)">No matching clients</td></tr>';
+/* ---- module: docs ---- */
+function renderModDocs(m){
+  const docs={
+    digital:'Owns everything client-facing online: the website, SEO positioning, content calendar, and social pipeline. Day-to-day: check Follow-Ups each morning for content awaiting client sign-off, use the Messages library to chase approvals, and log every publish in Pipeline as Resolved.',
+    operations:'Owns stock, inventory, payroll runs, and procurement. Day-to-day: log stock discrepancies as new records immediately, run payroll reminders through Follow-Ups on cycle day, and use Calls to record supplier conversations.',
+    cx:'Owns bookings, QR ordering, digital menu, guest journey, and membership. Day-to-day: every booking or membership event becomes a record; use Follow-Ups for no-shows and renewal nudges, and Objection templates for complaint handling.',
+    management:'Owns the executive dashboard, daily reports, and KPI tracking. Day-to-day: log each report as a record when generated, use Follow-Ups to confirm review with the client, and Calls to document strategy discussions.',
+    facilities:'Owns maintenance tickets, staff requests, and asset tracking. Day-to-day: every ticket is a record from creation to Resolved; use Follow-Ups to chase vendors and Calls to log site visits.',
+    training:'Owns SOPs, documentation, and staff onboarding guides. Day-to-day: each SOP rollout is a record; use Follow-Ups to confirm staff completed training and Messages for reminder wording.',
+    support:'Owns system updates, maintenance requests, and the consultation log. Day-to-day: every support request becomes a record on arrival; resolve promptly and use the post-resolution Follow-Up template to confirm the fix held.'
+  };
+  return `
+    <div class="card"><div style="font-size:15px;font-weight:800;margin-bottom:14px">${m.icon} ${m.title} — Department Manual</div>
+      <div class="docs-block"><h3>What this department owns</h3><p>${docs[m.id]||m.desc}</p></div>
+      <div class="docs-block"><h3>Tab-by-tab</h3>
+        <ul>
+          <li><b>Overview</b> — open/due/archived counts, region and signal breakdown, and the danger-zone reset.</li>
+          <li><b>Pipeline</b> — kanban of every record by stage (New → Contacted → Follow-Up → In Progress → Resolved). Click a card for the full record.</li>
+          <li><b>Follow-Ups</b> — everything due today or overdue, with a ready-to-send message, WhatsApp button, and one-tap Done / Snooze / Reject.</li>
+          <li><b>Calls</b> — log every phone conversation tied to a record; appears in that record's history automatically.</li>
+          <li><b>Messages</b> — the editable wording library for Cold, Follow-Up, and Objection-handling messages specific to this department.</li>
+          <li><b>Archive</b> — rejected or closed items; restore any of them back into the live pipeline at any time.</li>
+        </ul>
+      </div>
+      <div class="docs-block"><h3>Escalation</h3><p>If a record sits in Follow-Up for more than 3 snoozes, escalate it via a direct Call rather than another message — see the Calls tab.</p></div>
+    </div>
+  `;
 }
 
-function renderRenewals(){
-  const now=new Date();
-  const upcoming=clients.map(c=>({...c,days:Math.round((c.renewal-now)/86400000)})).filter(c=>c.days>=0&&c.days<=45).sort((a,b)=>a.days-b.days);
-  document.getElementById('renewalBody').innerHTML=upcoming.map(c=>`
-    <tr>
-      <td style="font-family:'Space Mono',monospace;color:var(--muted)">${c.id}</td>
-      <td>${c.industry}</td>
-      <td><span class="tier-badge" style="background:${c.tierColor}22;color:${c.tierColor};border:1px solid ${c.tierColor}">${c.tier}</span></td>
-      <td style="font-family:'Space Mono',monospace;color:var(--gold)">${fmtMoney(c.monthly)}</td>
-      <td>${fmtDate(c.renewal)}</td>
-      <td style="color:${c.days<=7?'var(--red)':'var(--text-dim)'}">${c.days}d</td>
-    </tr>`).join('')||'<tr><td colspan="6" style="text-align:center;padding:20px;color:var(--muted)">No renewals in this window</td></tr>';
+/* ============================================================
+   DAILY OUTREACH (global) — counters, follow-ups across all
+   departments, and quick links into each message library
+   ============================================================ */
+function renderOutreachTab(){
+  const today=state.dailyOutreach.filter(o=>isToday(o.ts));
+  const allDue=state.records.filter(r=>r.stage!=='Resolved'&&r.stage!=='Rejected'&&r.nextFollowUp<=todayStr());
+  const byModuleDue={};
+  allDue.forEach(r=>{byModuleDue[r.module]=(byModuleDue[r.module]||0)+1;});
+  return `
+    <div class="kpi-grid">
+      <div class="kpi" style="--accent:var(--gold)"><div class="label">MESSAGES TODAY</div><div class="value">${today.length}</div><div class="sub">${state.dailyOutreach.length} all-time</div></div>
+      <div class="kpi" style="--accent:var(--orange)"><div class="label">FOLLOW-UPS DUE — ALL DEPTS</div><div class="value">${allDue.length}</div><div class="sub">across all 7 departments</div></div>
+    </div>
+    <div class="card">
+      <label>Log a message sent manually (cold outreach, WhatsApp, SMS, etc.)</label>
+      <input id="out_note" placeholder="e.g. Sent cold outreach to Spice & Sizzle Food">
+      <button class="btn btn-primary btn-sm" style="margin-top:10px" onclick="logManualOutreach()">+ Log message sent</button>
+    </div>
+    <div class="section-title">Follow-ups due today, by department</div>
+    <div class="module-grid">
+      ${MODULES.map(m=>`<div class="card module-card" onclick="setDashTab('modules');openModule('${m.id}');setModuleTab('followups')">
+        <div style="font-size:20px">${m.icon}</div>
+        <div style="font-size:12px;font-weight:700;color:var(--gold);margin-top:6px">${m.title}</div>
+        <div class="count">${byModuleDue[m.id]||0}</div>
+        <div style="font-size:9px;color:var(--muted)">due today — open Follow-Ups</div>
+      </div>`).join('')}
+    </div>
+    <div class="section-title">Recent outreach log</div>
+    ${state.dailyOutreach.slice(0,15).map(o=>`<div class="activity-item"><div class="dot" style="background:var(--gold)"></div><div>${o.note} <span style="color:var(--muted);font-size:10px">· ${fmtDate(o.ts)}</span></div></div>`).join('')||'<div style="color:var(--muted);font-size:12px">Nothing logged yet.</div>'}
+  `;
+}
+async function logManualOutreach(){
+  const note=document.getElementById('out_note').value.trim();
+  if(!note){ showToast('Add a short note first'); return; }
+  state.dailyOutreach.unshift({id:uid('OUT'),note,ts:Date.now()});
+  await saveOutreach();
+  document.getElementById('out_note').value='';
+  showToast('Logged');
+  renderDashboard();
 }
 
-renderKPIs();renderPillars();renderRevChart();renderActivity();renderTierFilters();renderClients();renderRenewals();
+/* ============================================================
+   GLOBAL ARCHIVE — rejected/archived records across every
+   department plus churned clients, all restorable
+   ============================================================ */
+function renderGlobalArchiveTab(){
+  const archived=state.records.filter(r=>r.stage==='Rejected'||r.archived);
+  const churned=state.clients.filter(c=>c.stage==='Churned');
+  return `
+    <div class="doc-note">Nothing is ever deleted. Every rejected department record and every churned client lives here, fully restorable.</div>
+    <div class="kpi-grid">
+      <div class="kpi" style="--accent:var(--red)"><div class="label">ARCHIVED RECORDS</div><div class="value">${archived.length}</div><div class="sub">across all departments</div></div>
+      <div class="kpi" style="--accent:var(--muted)"><div class="label">CHURNED CLIENTS</div><div class="value">${churned.length}</div><div class="sub">see Clients tab to restore stage</div></div>
+    </div>
+    <div class="section-title">Archived department records</div>
+    ${archived.map(r=>`<div class="record-row">
+      <div style="flex:1"><div style="font-weight:700;font-size:12px">${m_label(r.module)} — ${r.title}</div><div style="font-size:11px;color:var(--text-dim)">${r.clientName} · ${r.region||'—'}</div></div>
+      <button class="btn btn-green btn-sm" onclick="restoreRecord('${r.id}')">↺ Restore</button>
+    </div>`).join('')||'<div style="color:var(--muted);font-size:12px">No archived records.</div>'}
+    <div class="section-title">Churned clients</div>
+    ${churned.map(c=>`<div class="record-row">
+      <div style="flex:1"><div style="font-weight:700;font-size:12px">${c.name}</div><div style="font-size:11px;color:var(--text-dim)">${c.industry} · ${c.region}</div></div>
+      <button class="btn btn-green btn-sm" onclick="updateClient('${c.id}','stage','Renewal Due')">↺ Restore to Renewal Due</button>
+    </div>`).join('')||'<div style="color:var(--muted);font-size:12px">No churned clients.</div>'}
+  `;
+}
+
+/* ---------- REVENUE TAB ---------- */
+function renderRevenueTab(){
+  const active=state.clients.filter(c=>c.stage==='Active'||c.stage==='Renewal Due');
+  const mrr=active.reduce((s,c)=>s+c.monthly,0);
+  const buildValue=active.reduce((s,c)=>s+c.contractValue,0);
+  return `
+    <div class="kpi-grid">
+      <div class="kpi" style="--accent:var(--gold)"><div class="label">MRR</div><div class="value">${fmtMoney(mrr)}</div><div class="sub">recurring, active book</div></div>
+      <div class="kpi" style="--accent:var(--green)"><div class="label">ANNUALISED RUN RATE</div><div class="value" style="font-size:20px">${fmtMoney(mrr*12)}</div><div class="sub">MRR × 12</div></div>
+      <div class="kpi" style="--accent:var(--purple)"><div class="label">CUMULATIVE BUILD VALUE</div><div class="value" style="font-size:20px">${fmtMoney(buildValue)}</div><div class="sub">one-time contracts, active book</div></div>
+    </div>
+    <div class="section-title">Revenue by tier — detail</div>
+    <div class="card"><table>
+      <thead><tr><th>Tier</th><th>Active clients</th><th>MRR contribution</th><th>Build value contribution</th></tr></thead>
+      <tbody>${state.tiers.map(t=>{
+        const inTier=active.filter(c=>c.tierKey===t.key);
+        return `<tr><td>${t.name}</td><td class="mono">${inTier.length}</td><td class="mono" style="color:var(--gold)">${fmtMoney(inTier.reduce((s,c)=>s+c.monthly,0))}</td><td class="mono">${fmtMoney(inTier.reduce((s,c)=>s+c.contractValue,0))}</td></tr>`;
+      }).join('')}</tbody>
+    </table></div>
+    <div class="section-title">Revenue by region</div>
+    <div class="card"><table>
+      <thead><tr><th>Region</th><th>Active clients</th><th>MRR</th></tr></thead>
+      <tbody>${REGIONS.map(rg=>{
+        const inRg=active.filter(c=>c.region===rg);
+        return `<tr><td>${rg}</td><td class="mono">${inRg.length}</td><td class="mono" style="color:var(--gold)">${fmtMoney(inRg.reduce((s,c)=>s+c.monthly,0))}</td></tr>`;
+      }).join('')}</tbody>
+    </table></div>
+    <div class="section-title">Renewals — next 45 days</div>
+    <div class="card"><div class="scroll-table"><table>
+      <thead><tr><th>Client</th><th>Tier</th><th>MRR</th><th>Renewal</th><th>Days out</th></tr></thead>
+      <tbody>${state.clients.map(c=>({...c,days:Math.round((new Date(c.renewal)-new Date())/86400000)})).filter(c=>c.days>=0&&c.days<=45).sort((a,b)=>a.days-b.days).map(c=>`<tr class="rowlink" onclick="openClient('${c.id}')"><td>${c.name}</td><td>${(state.tiers.find(t=>t.key===c.tierKey)||{}).name||'—'}</td><td class="mono" style="color:var(--gold)">${fmtMoney(c.monthly)}</td><td>${fmtDate(c.renewal)}</td><td style="color:${c.days<=7?'var(--red)':'var(--text-dim)'}">${c.days}d</td></tr>`).join('')||'<tr><td colspan="5" style="text-align:center;padding:16px;color:var(--muted)">None in this window</td></tr>'}</tbody>
+    </table></div></div>
+  `;
+}
+
+/* ---------- ACTIVITY LOG TAB ---------- */
+function renderActivityTab(){
+  return `<div class="card">${state.activity.map(a=>`<div class="timeline-item"><a onclick="openClient('${a.clientId}')" style="cursor:pointer;color:var(--gold)">${a.clientName}</a> — ${a.text} <span style="color:var(--muted);font-size:10px">· ${fmtDate(a.ts)}</span></div>`).join('')||'<div style="color:var(--muted)">No activity yet.</div>'}</div>`;
+}
+
+/* ---------- ADD CLIENT (internal) ---------- */
+function renderAddClientTab(){
+  return `<div class="card" style="max-width:560px">
+    <label>Business alias / working name *</label><input id="ac_name" placeholder="e.g. Client — Fine Dining Group">
+    <div class="form-row2">
+      <div><label>Industry</label><select id="ac_industry">${INDUSTRIES.map(i=>`<option>${i}</option>`).join('')}</select></div>
+      <div><label>Region</label><select id="ac_region">${REGIONS.map(r=>`<option>${r}</option>`).join('')}</select></div>
+    </div>
+    <div class="form-row2">
+      <div><label>Stage</label><select id="ac_stage">${STAGES.map(s=>`<option ${s==='Onboarding'?'selected':''}>${s}</option>`).join('')}</select></div>
+      <div><label>Tier</label><select id="ac_tier">${state.tiers.map(t=>`<option value="${t.key}">${t.name}</option>`).join('')}</select></div>
+    </div>
+    <div class="form-row2">
+      <div><label>Contact name</label><input id="ac_contact"></div>
+      <div><label>Contact number</label><input id="ac_number"></div>
+    </div>
+    <label>Notes</label><textarea id="ac_notes" rows="2"></textarea>
+    <button class="btn btn-primary" style="margin-top:12px;width:100%;justify-content:center" onclick="submitInternalAdd()">+ Add client to Command Centre</button>
+    <div id="ac_result" style="margin-top:10px;font-size:12px"></div>
+  </div>`;
+}
+async function submitInternalAdd(){
+  const name=document.getElementById('ac_name').value.trim();
+  if(!name){ document.getElementById('ac_result').innerHTML='<span style="color:var(--red)">Name is required.</span>'; return; }
+  const tier=state.tiers.find(t=>t.key===document.getElementById('ac_tier').value)||state.tiers[0];
+  const c={
+    id:uid('ECS'),name,industry:document.getElementById('ac_industry').value,region:document.getElementById('ac_region').value,
+    tierKey:tier.key,stage:document.getElementById('ac_stage').value,contractValue:tier.build,monthly:tier.monthly,
+    health:80,renewal:new Date(Date.now()+365*86400000).toISOString(),created:new Date().toISOString(),
+    modules:[],notes:document.getElementById('ac_notes').value.trim(),
+    contactName:document.getElementById('ac_contact').value.trim(),contactNumber:document.getElementById('ac_number').value.trim()
+  };
+  state.clients.unshift(c);
+  await saveClients();
+  addActivity(c.id,c.name,'Added internally to Command Centre at '+c.stage+' stage.');
+  document.getElementById('ac_result').innerHTML='<span style="color:var(--green);font-weight:700">✓ '+name+' added.</span>';
+  showToast('Client added — '+name);
+}
+
+/* ---------- SETTINGS / PRICING ---------- */
+function renderSettingsTab(){
+  return `<div class="card"><div class="section-title" style="margin-top:0">Pricing tiers (editable — changes apply to new clients going forward)</div>
+    <table><thead><tr><th>Tier</th><th>One-time build (GH₵)</th><th>Monthly retainer (GH₵)</th></tr></thead>
+    <tbody>${state.tiers.map((t,i)=>`<tr>
+      <td>${t.name}</td>
+      <td><input class="mono" style="width:130px" type="number" value="${t.build}" onchange="updateTier(${i},'build',this.value)"></td>
+      <td><input class="mono" style="width:130px" type="number" value="${t.monthly}" onchange="updateTier(${i},'monthly',this.value)"></td>
+    </tr>`).join('')}</tbody></table>
+  </div>
+  <div class="card" style="margin-top:16px;border-color:var(--red)">
+    <div class="section-title" style="margin-top:0;color:var(--red)">Reset demo data</div>
+    <div style="font-size:12px;color:var(--text-dim);margin-bottom:10px">Wipes clients, records, calls, activity, and outreach log, then reseeds a fresh 50-client demo portfolio. Use before a live pitch to start clean.</div>
+    <button class="btn btn-red btn-sm" onclick="resetAllData()">🗑 Reset all demo data</button>
+  </div>`;
+}
+function updateTier(i,field,val){ state.tiers[i][field]=parseFloat(val)||0; showToast('Tier updated'); renderDashboard(); }
+async function resetAllData(){
+  if(!confirm('Reset ALL demo data? This clears clients, records, calls, and activity.'))return;
+  state.clients=seedClients(); await saveClients();
+  state.activity=seedActivity(state.clients); await saveActivity();
+  state.records=seedRecords(state.clients); await saveRecords();
+  state.calls=seedCalls(state.records); await saveCalls();
+  state.dailyOutreach=seedDailyOutreach(); await saveOutreach();
+  showToast('Demo data reset');
+  renderDashboard();
+}
+
+/* ---------- DOCUMENTATION ---------- */
+function renderDocsTab(){
+  const docs=[
+    {t:'Overview',b:'The executive summary of the whole portfolio: total MRR, cumulative contract value, prospects in pipeline, upcoming renewals, messages sent today, follow-ups due across all departments today, and calls logged today. Start every session here.'},
+    {t:'Pipeline',b:'A kanban view of every client by stage — Prospect → Onboarding → Active → Renewal Due → Paused → Churned. Click any card to open the full client record. New applications from the public Apply form land here automatically as Prospect.'},
+    {t:'Clients',b:'The full searchable client register. Filter by stage and by region, search by name/industry, and click any row to open the client detail record — where you can change stage, toggle which of the seven departments are active for that client, log a note, and see their full activity timeline.'},
+    {t:'Departments',b:'The seven operational pillars, each with its own full workspace: Overview (counts, region and signal breakdowns), Pipeline (kanban by record stage), Follow-Ups (due-today queue with ready-to-send messages and one-tap actions), Calls (call log tied to records), Messages (editable per-department wording library for cold outreach, follow-ups, and objection handling), Archive (rejected items, restorable), and Docs (how to run that department day-to-day).'},
+    {t:'Daily Outreach',b:'The company-wide counter for messages sent today and all-time, a manual log button for outreach done outside a specific record, and a per-department breakdown of how many follow-ups are due right now.'},
+    {t:'Revenue',b:'MRR, annualised run rate, and cumulative build value, broken down by tier and by region, with active-client counts. The renewals table repeats the 45-day renewal window with direct links into each client record.'},
+    {t:'Activity Log',b:'A single reverse-chronological feed of every system event — applications, stage changes, record additions, calls, message sends, ticket resolutions — across the entire portfolio and every department. Click any client name to jump to their record.'},
+    {t:'Archive',b:'Every rejected or closed-out department record, plus every churned client, in one place. Nothing is ever deleted — restore any of them back into an active pipeline at any time.'},
+    {t:'+ Add Client',b:'The internal intake form for staff to add an already-signed or manually-sourced client directly, with full control over starting stage, tier, and notes — the same underlying record as the public Apply form, just entered from inside the Command Centre instead of the outward-facing site.'},
+    {t:'Pricing / Settings',b:'The four investment tiers (Foundation, Growth, Enterprise, Flagship Command System) with their one-time build value and monthly retainer, editable for new applications going forward. Also includes a full demo-data reset for a clean live pitch.'}
+  ];
+  const active=state.clients.filter(c=>c.stage==='Active'||c.stage==='Renewal Due');
+  const mrr=active.reduce((s,c)=>s+c.monthly,0);
+  const buildValue=active.reduce((s,c)=>s+c.contractValue,0);
+  return `<div class="card"><div style="font-size:15px;font-weight:800;margin-bottom:16px">Operator Manual — read this before running a live demo or handing the system to staff</div>
+
+    <div class="docs-block"><h3>1. What this system is, in one sentence</h3><p>Every pillar of the business — bookings, stock, payroll, facilities, membership, brand, and executive reporting — lives in one dashboard instead of a dozen disconnected spreadsheets and apps, and every number on screen is computed live, not typed in by hand. Each department is a mini command centre in its own right: its own pipeline, its own message library, its own follow-up queue, its own call log, and its own archive.</p></div>
+
+    <div class="section-title" style="margin-top:20px">Tab-by-tab operating guide</div>
+    ${docs.map(d=>`<div class="docs-block"><h3>${d.t}</h3><p>${d.b}</p></div>`).join('')}
+
+    <div class="docs-block"><h3>Data &amp; persistence</h3><p>Every action in this Command Centre — a new application, a stage change, a department record, a call, a message sent, a note — is written to persistent storage immediately and reloads on your next visit. This is a full working system, not a static mockup: nothing here needs a separate backend to function, though the companion Apps Script file can mirror the same data into a real Google Sheet if a client wants their data in spreadsheet form as well.</p></div>
+
+    <div class="section-title" style="margin-top:24px">The ROI case (use this in live pitches)</div>
+    <div class="docs-block"><p>Live portfolio right now: <b style="color:var(--gold)">${fmtMoney(mrr)}</b> MRR across ${active.length} active accounts, <b style="color:var(--gold)">${fmtMoney(buildValue)}</b> in cumulative build value. Industry data shows fragmented, manual operations typically leak 10–15% of monthly revenue through unrecorded sales, stock drift, and booking friction — on a GH₵300,000/month operation that is over GH₵45,000 lost every month. A Flagship build (GH₵250,000 + GH₵15,000/mo) recovers its own cost in roughly six months purely by sealing that leak; every month after that is added margin, not a sunk cost.</p></div>
+
+    <div class="section-title" style="margin-top:24px">Objection handling cheat-sheet</div>
+    <div class="docs-block">
+      <p><b style="color:var(--gold)">"We already use spreadsheets."</b> — Spreadsheets don't alert anyone, don't sync across locations or staff in real time, and break under concurrent edits. This replaces that layer entirely; existing spreadsheet data migrates in during onboarding.</p>
+      <p><b style="color:var(--gold)">"This is expensive."</b> — Price it against what leakage already costs monthly, not in isolation. Walk them through the ROI case above with their own estimated turnover.</p>
+      <p><b style="color:var(--gold)">"Will staff actually use it?"</b> — Every tier includes hands-on SOP training, and every department has its own Docs tab built into the product itself — staff are never handed a system without a written guide for running it.</p>
+      <p><b style="color:var(--gold)">"What happens after the sale?"</b> — The monthly retainer is 24/7 priority support, continuous optimisation, automatic daily backups, and a monthly operational audit — not passive maintenance.</p>
+    </div>
+
+    <div class="section-title" style="margin-top:24px">Demo script — walking a prospect through this live</div>
+    <div class="docs-block"><p>1. Start on the public site — show the ROI section and pricing.<br>2. Submit a real application through Apply — point out it just became a live Prospect record.<br>3. Open the Command Centre → Pipeline and show the new card sitting there.<br>4. Open Departments → Facilities (or any pillar), add a real ticket, move it through Pipeline, log a Call, and show the Follow-Up queue with a ready-to-send message and WhatsApp button.<br>5. Reject a demo item live and show it land in that department's Archive, then restore it — proves nothing is ever lost.<br>6. Close on Revenue — show MRR, cumulative contract value, and the 45-day renewals view as what they'll be looking at as a live client.</p></div>
+  </div>`;
+}
+
+/* ============================================================
+   CLIENT DETAIL MODAL
+   ============================================================ */
+function openClient(id){
+  state.selectedClientId=id;
+  const c=state.clients.find(x=>x.id===id);
+  if(!c)return;
+  const tier=state.tiers.find(t=>t.key===c.tierKey)||state.tiers[0];
+  const timeline=state.activity.filter(a=>a.clientId===id);
+  const clientRecords=state.records.filter(r=>r.clientId===id);
+  document.getElementById('modalRoot').innerHTML=`
+    <div class="overlay" onclick="if(event.target===this)closeClientModal()">
+      <div class="modal">
+        <div class="modal-head">
+          <div><div style="font-size:17px;font-weight:800">${c.name}</div><div style="font-size:11px;color:var(--muted);margin-top:3px">${c.id} · ${c.industry} · ${c.region}</div></div>
+          <button class="modal-close" onclick="closeClientModal()">✕</button>
+        </div>
+        <div class="detail-grid">
+          <div><div class="k">Stage</div><select id="cd_stage" onchange="updateClient('${id}','stage',this.value)">${STAGES.map(s=>`<option ${s===c.stage?'selected':''}>${s}</option>`).join('')}</select></div>
+          <div><div class="k">Tier</div><div class="v">${tier.name}</div></div>
+          <div><div class="k">Monthly retainer</div><div class="v mono" style="color:var(--gold)">${fmtMoney(c.monthly)}</div></div>
+          <div><div class="k">Contract value</div><div class="v mono">${fmtMoney(c.contractValue)}</div></div>
+          <div><div class="k">Renewal date</div><div class="v">${fmtDate(c.renewal)}</div></div>
+          <div><div class="k">Health score</div><div class="v mono">${c.health}</div></div>
+          <div><div class="k">Contact</div><div class="v">${c.contactName||'—'} · ${c.contactNumber||'—'}</div></div>
+          <div><div class="k">Client since</div><div class="v">${fmtDate(c.created)}</div></div>
+        </div>
+        <div class="k">Active modules</div>
+        <div class="module-check-row">${MODULES.map(m=>`<label class="module-check"><input type="checkbox" ${c.modules.includes(m.id)?'checked':''} onchange="toggleClientModule('${id}','${m.id}',this.checked)"> ${m.icon} ${m.title}</label>`).join('')}</div>
+        <div class="k" style="margin-top:12px">Notes</div>
+        <textarea id="cd_notes" rows="2">${c.notes||''}</textarea>
+        <button class="btn btn-ghost btn-sm" style="margin-top:6px" onclick="saveClientNote('${id}')">Save note</button>
+        <div class="section-title">Records tied to this client (${clientRecords.length})</div>
+        ${clientRecords.slice(0,8).map(r=>`<div style="font-size:11px;color:var(--text-dim);padding:5px 0;border-bottom:1px solid #1c1a16;cursor:pointer" onclick="closeClientModal();openRecordModal('${r.id}')">${MODULES.find(m=>m.id===r.module).icon} ${r.title} — <span class="pill" style="background:${STAGE_COLOR2[r.stage]}22;color:${STAGE_COLOR2[r.stage]}">${r.stage}</span></div>`).join('')||'<div style="font-size:11px;color:var(--muted)">None yet.</div>'}
+        <div class="section-title">Activity timeline</div>
+        ${timeline.map(a=>`<div class="timeline-item">${a.text} <span style="color:var(--muted);font-size:10px">· ${fmtDate(a.ts)}</span></div>`).join('')||'<div style="font-size:11px;color:var(--muted)">No activity logged yet.</div>'}
+      </div>
+    </div>
+  `;
+}
+function closeClientModal(){ document.getElementById('modalRoot').innerHTML=''; state.selectedClientId=null; }
+async function updateClient(id,field,value){
+  const c=state.clients.find(x=>x.id===id);
+  if(!c)return;
+  const old=c[field]; c[field]=value;
+  await saveClients();
+  addActivity(id,c.name,field+' changed from "'+old+'" to "'+value+'"');
+  showToast('Updated');
+  renderDashboard();
+}
+async function toggleClientModule(id,moduleId,checked){
+  const c=state.clients.find(x=>x.id===id);
+  if(!c)return;
+  if(checked && !c.modules.includes(moduleId))c.modules.push(moduleId);
+  if(!checked)c.modules=c.modules.filter(mm=>mm!==moduleId);
+  await saveClients();
+  addActivity(id,c.name,(checked?'Activated ':'Deactivated ')+MODULES.find(m=>m.id===moduleId).title+' module');
+  showToast('Module '+(checked?'activated':'deactivated'));
+}
+async function saveClientNote(id){
+  const c=state.clients.find(x=>x.id===id);
+  if(!c)return;
+  c.notes=document.getElementById('cd_notes').value;
+  await saveClients();
+  addActivity(id,c.name,'Note updated');
+  showToast('Note saved');
+}
+
+/* ============================================================
+   HELPERS re-render for search/filter without full reflow
+   ============================================================ */
+function renderInto(){
+  document.getElementById('dashBody').innerHTML=renderClientsTab();
+  wireDashInputs();
+}
+function wireDashInputs(){
+  renderClientsBody();
+}
+
+/* ============================================================
+   INIT
+   ============================================================ */
+(async function init(){
+  await loadState();
+  setView('landing');
+})();
 </script>
 </body>
 </html>
