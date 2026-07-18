@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Enterprise Command System — Live Demo</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --black:#0a0a0a; --surface:#111111; --card:#161514; --border:#2a2621;
+    --gold:#e8b84b; --gold-dim:#b8933a; --cream:#f2ede0; --muted:#8a8378;
+    --green:#3fb66f; --red:#e05a4e; --blue:#4a90c9; --purple:#a97be0; --teal:#3fb6a8;
+    --text:#f2ede0; --text-dim:#b3ab9c;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--black);color:var(--text);font-family:'Syne',sans-serif;min-height:100vh;}
+  .header{background:var(--surface);border-bottom:1px solid var(--border);padding:18px 28px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:50;}
+  .brand{display:flex;align-items:center;gap:12px;}
+  .brand .mark{width:38px;height:38px;border-radius:8px;background:linear-gradient(135deg,var(--gold),var(--gold-dim));display:flex;align-items:center;justify-content:center;color:#0a0a0a;font-weight:800;font-size:18px;}
+  .brand .name{font-weight:800;letter-spacing:1px;font-size:16px;}
+  .brand .tag{font-size:10px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-top:2px;}
+  .demo-badge{background:rgba(232,184,75,0.12);border:1px solid var(--gold);color:var(--gold);font-size:10px;font-weight:700;letter-spacing:1.5px;padding:6px 12px;border-radius:20px;}
+  .main{max-width:1400px;margin:0 auto;padding:28px;}
+  .demo-note{background:#1a1710;border:1px solid var(--gold-dim);border-radius:8px;padding:12px 16px;font-size:12px;color:var(--text-dim);margin-bottom:24px;line-height:1.6;}
+  .demo-note b{color:var(--gold);}
+  .kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px;margin-bottom:24px;}
+  .kpi{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:18px;position:relative;overflow:hidden;}
+  .kpi::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--accent,var(--gold));}
+  .kpi .label{font-size:10px;letter-spacing:2px;color:var(--muted);font-weight:700;margin-bottom:8px;}
+  .kpi .value{font-size:28px;font-weight:800;font-family:'Space Mono',monospace;color:var(--accent,var(--gold));}
+  .kpi .sub{font-size:11px;color:var(--text-dim);margin-top:6px;}
+  .section-title{font-size:11px;font-weight:700;letter-spacing:3px;color:var(--muted);text-transform:uppercase;margin:32px 0 12px;}
+  .grid-2{display:grid;grid-template-columns:1.3fr 1fr;gap:16px;}
+  @media(max-width:900px){.grid-2{grid-template-columns:1fr;}}
+  .card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:18px;}
+  .pillars{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;}
+  .pillar{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:14px;text-align:center;}
+  .pillar .ic{font-size:20px;margin-bottom:6px;}
+  .pillar .t{font-size:11px;font-weight:700;color:var(--cream);}
+  .pillar .s{font-size:9px;color:var(--muted);margin-top:4px;}
+  table{width:100%;border-collapse:collapse;font-size:12px;}
+  th{text-align:left;padding:9px 10px;color:var(--muted);font-weight:700;letter-spacing:1px;font-size:9px;border-bottom:1px solid var(--border);}
+  td{padding:8px 10px;border-bottom:1px solid #1c1a16;vertical-align:middle;}
+  tr:hover td{background:#1a1814;}
+  .tier-badge{display:inline-block;padding:3px 9px;border-radius:4px;font-size:9px;font-weight:700;letter-spacing:0.5px;white-space:nowrap;}
+  .status-dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:6px;}
+  .filter-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;}
+  .filter-btn{padding:6px 13px;border-radius:5px;border:1px solid var(--border);background:var(--surface);color:var(--text-dim);cursor:pointer;font-size:10px;font-weight:700;letter-spacing:1px;font-family:'Syne',sans-serif;}
+  .filter-btn.active{background:var(--gold);color:#0a0a0a;border-color:var(--gold);}
+  .filter-btn:hover:not(.active){border-color:var(--gold);color:var(--text);}
+  .search-input{background:var(--surface);border:1px solid var(--border);color:var(--text);padding:9px 13px;border-radius:6px;font-size:12px;font-family:'Syne',sans-serif;width:100%;outline:none;margin-bottom:14px;}
+  .search-input:focus{border-color:var(--gold);}
+  .activity-item{display:flex;gap:10px;padding:9px 0;border-bottom:1px solid #1c1a16;font-size:11px;}
+  .activity-item:last-child{border:none;}
+  .activity-dot{width:6px;height:6px;border-radius:50%;margin-top:5px;flex-shrink:0;}
+  .bar-wrap{display:flex;align-items:flex-end;gap:8px;height:150px;margin-top:14px;}
+  .bar-group{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;}
+  .bar{width:100%;border-radius:3px 3px 0 0;background:linear-gradient(180deg,var(--gold),var(--gold-dim));}
+  .bar-label{font-size:9px;color:var(--muted);font-family:'Space Mono',monospace;}
+  .scroll-table{overflow-x:auto;max-height:520px;overflow-y:auto;}
+  .footer-note{margin-top:36px;padding-top:18px;border-top:1px solid var(--border);font-size:11px;color:var(--muted);text-align:center;line-height:1.8;}
+</style>
+</head>
+<body>
+<div class="header">
+  <div class="brand">
+    <div class="mark">E</div>
+    <div><div class="name">ENTERPRISE COMMAND SYSTEM</div><div class="tag">Unified Business Operating Dashboard</div></div>
+  </div>
+  <div class="demo-badge">● LIVE DEMO DATA</div>
+</div>
+
+<div class="main">
+  <div class="demo-note">
+    <b>This is a working demo</b>, pre-loaded with 50 generated portfolio-client records across ten industries to show the system's shape at real scale. No client identities are used anywhere in this build — every name below is a generated placeholder. Every number, chart, and table on this page is computed live in your browser from that data, exactly the way the production dashboard computes from a live Google Sheet.
+  </div>
+
+  <div class="kpi-grid" id="kpiGrid"></div>
+
+  <div class="section-title">System Architecture — What This Dashboard Runs On</div>
+  <div class="pillars" id="pillarsGrid"></div>
+
+  <div class="grid-2" style="margin-top:24px">
+    <div class="card">
+      <div class="section-title" style="margin-top:0">Revenue by Tier</div>
+      <div class="bar-wrap" id="revChart"></div>
+    </div>
+    <div class="card">
+      <div class="section-title" style="margin-top:0">Live Activity Feed</div>
+      <div id="activityFeed"></div>
+    </div>
+  </div>
+
+  <div class="section-title">Client Portfolio — 50 Active Records</div>
+  <input class="search-input" id="clientSearch" placeholder="Search by industry, tier, status, region..." oninput="renderClients()">
+  <div class="filter-row" id="tierFilters"></div>
+  <div class="card">
+    <div class="scroll-table">
+      <table>
+        <thead><tr><th>ID</th><th>Industry</th><th>Region</th><th>Package Tier</th><th>Monthly Value</th><th>Status</th><th>Renewal</th><th>Health</th></tr></thead>
+        <tbody id="clientBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="section-title">Renewals — Next 45 Days</div>
+  <div class="card">
+    <div class="scroll-table" style="max-height:300px">
+      <table>
+        <thead><tr><th>ID</th><th>Industry</th><th>Package Tier</th><th>Value</th><th>Renewal Date</th><th>Days Out</th></tr></thead>
+        <tbody id="renewalBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="footer-note">
+    Enterprise Command System — a single dashboard unifying client pipeline, package tiers, renewals, revenue reporting, and daily activity for a services or hospitality business.<br>
+    All data on this page is generated locally for demonstration. Nothing here is transmitted anywhere.
+  </div>
+</div>
+
+<script>
+// ---------- seeded RNG so the demo looks the same every time it's opened ----------
+function mulberry32(seed){return function(){seed|=0;seed=seed+0x6D2B79F5|0;let t=Math.imul(seed^seed>>>15,1|seed);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+const rand=mulberry32(20260718);
+function pick(arr){return arr[Math.floor(rand()*arr.length)];}
+function randInt(min,max){return Math.floor(rand()*(max-min+1))+min;}
+
+const INDUSTRIES=['Hospitality & Lodging','Fine Dining','Retail & Fashion','Wellness & Spa','Real Estate','Logistics & Transport','Automotive Services','Education & Training','Healthcare Clinic','Events & Venues','Salon & Beauty','Construction & Trade'];
+const REGIONS=['Greater Accra','Ashanti','Eastern Region','Central Region','Western Region','Volta Region'];
+const TIERS=[
+  {name:'Business Presence',color:'var(--muted)',monthly:0,weight:6},
+  {name:'Verified Business',color:'var(--teal)',monthly:80,weight:14},
+  {name:'Visibility Partner — T1',color:'var(--blue)',monthly:250,weight:10},
+  {name:'Visibility Partner — T2',color:'var(--blue)',monthly:750,weight:6},
+  {name:'Business Authority',color:'var(--purple)',monthly:5000,weight:3},
+  {name:'SME Systems — Starter',color:'var(--green)',monthly:50,weight:8},
+  {name:'SME Systems — Growth',color:'var(--green)',monthly:150,weight:6},
+  {name:'SME Systems — Authority',color:'var(--green)',monthly:500,weight:3},
+  {name:'Enterprise Command System',color:'var(--gold)',monthly:15000,weight:2}
+];
+function weightedTier(){
+  const total=TIERS.reduce((s,t)=>s+t.weight,0);let r=rand()*total;
+  for(const t of TIERS){if(r<t.weight)return t;r-=t.weight;}
+  return TIERS[0];
+}
+const STATUSES=[{n:'Active',c:'var(--green)',w:38},{n:'Onboarding',c:'var(--blue)',w:5},{n:'Renewal Due',c:'var(--gold)',w:5},{n:'Paused',c:'var(--muted)',w:2}];
+function weightedStatus(){const total=STATUSES.reduce((s,t)=>s+t.w,0);let r=rand()*total;for(const s of STATUSES){if(r<s.w)return s;r-=s.w;}return STATUSES[0];}
+
+const clients=[];
+for(let i=1;i<=50;i++){
+  const tier=weightedTier();
+  const status=weightedStatus();
+  const daysToRenew=randInt(-10,120);
+  const d=new Date();d.setDate(d.getDate()+daysToRenew);
+  clients.push({
+    id:'ECS-'+String(1000+i),
+    industry:pick(INDUSTRIES),
+    region:pick(REGIONS),
+    tier:tier.name,tierColor:tier.color,monthly:tier.monthly,
+    status:status.n,statusColor:status.c,
+    renewal:d,
+    health:randInt(58,99)
+  });
+}
+
+function fmtDate(d){return d.toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'});}
+function fmtMoney(n){return 'GH₵ '+n.toLocaleString();}
+
+function renderKPIs(){
+  const active=clients.filter(c=>c.status==='Active'||c.status==='Renewal Due');
+  const mrr=active.reduce((s,c)=>s+c.monthly,0);
+  const avgDeal=Math.round(mrr/active.filter(c=>c.monthly>0).length);
+  const dueSoon=clients.filter(c=>{const days=Math.round((c.renewal-new Date())/86400000);return days>=0&&days<=45;}).length;
+  const enterprise=clients.filter(c=>c.tier==='Enterprise Command System').length;
+  document.getElementById('kpiGrid').innerHTML=`
+    <div class="kpi" style="--accent:var(--gold)"><div class="label">TOTAL PORTFOLIO MRR</div><div class="value">${fmtMoney(mrr)}</div><div class="sub">${active.length} active accounts</div></div>
+    <div class="kpi" style="--accent:var(--green)"><div class="label">TOTAL CLIENTS</div><div class="value">${clients.length}</div><div class="sub">across ${new Set(clients.map(c=>c.industry)).size} industries</div></div>
+    <div class="kpi" style="--accent:var(--purple)"><div class="label">ENTERPRISE TIER</div><div class="value">${enterprise}</div><div class="sub">flagship Command System deployments</div></div>
+    <div class="kpi" style="--accent:var(--blue)"><div class="label">AVG DEAL SIZE</div><div class="value">${fmtMoney(avgDeal)}</div><div class="sub">monthly, paying accounts</div></div>
+    <div class="kpi" style="--accent:var(--teal)"><div class="label">RENEWALS — 45D</div><div class="value">${dueSoon}</div><div class="sub">upcoming renewal window</div></div>
+  `;
+}
+
+const PILLARS=[
+  {ic:'🌐',t:'Digital Presence',s:'Website · SEO · Content'},
+  {ic:'📦',t:'Operations',s:'Stock · Payroll · Procurement'},
+  {ic:'📱',t:'Customer Experience',s:'QR Ordering · Membership'},
+  {ic:'📊',t:'Management',s:'Executive Dashboard · KPIs'},
+  {ic:'🧰',t:'Facilities',s:'Maintenance · Asset Tracking'},
+  {ic:'🎓',t:'Training',s:'SOPs · Staff Guides'},
+  {ic:'🛟',t:'Support',s:'Updates · Consultation'}
+];
+function renderPillars(){document.getElementById('pillarsGrid').innerHTML=PILLARS.map(p=>`<div class="pillar"><div class="ic">${p.ic}</div><div class="t">${p.t}</div><div class="s">${p.s}</div></div>`).join('');}
+
+function renderRevChart(){
+  const byTier={};
+  clients.forEach(c=>{if(c.monthly>0)byTier[c.tier]=(byTier[c.tier]||0)+c.monthly;});
+  const entries=Object.entries(byTier).sort((a,b)=>b[1]-a[1]);
+  const max=Math.max(...entries.map(e=>e[1]));
+  document.getElementById('revChart').innerHTML=entries.map(([name,val])=>`
+    <div class="bar-group">
+      <div style="font-size:9px;color:var(--gold);font-family:'Space Mono',monospace">${val>=1000?(val/1000).toFixed(1)+'k':val}</div>
+      <div class="bar" style="height:${Math.max(6,Math.round((val/max)*110))}px"></div>
+      <div class="bar-label" style="writing-mode:vertical-rl;text-orientation:mixed;height:60px">${name}</div>
+    </div>`).join('');
+}
+
+const ACTIVITY_TEMPLATES=[
+  'moved to Active after onboarding call',
+  'renewed for another 12 months',
+  'upgraded from Verified to Visibility Partner',
+  'monthly report generated and delivered',
+  'flagged as Renewal Due — outreach scheduled',
+  'new SME Systems deployment completed',
+  'Enterprise Command System check-in logged',
+  'facilities ticket resolved and closed',
+  'payroll cycle processed automatically',
+  'new lead converted from portfolio referral'
+];
+function renderActivity(){
+  const items=[];
+  for(let i=0;i<10;i++){
+    const c=pick(clients);
+    const mins=randInt(4,720);
+    items.push({text:c.id+' ('+c.industry+') — '+pick(ACTIVITY_TEMPLATES),color:c.statusColor,mins});
+  }
+  items.sort((a,b)=>a.mins-b.mins);
+  document.getElementById('activityFeed').innerHTML=items.map(it=>`
+    <div class="activity-item"><div class="activity-dot" style="background:${it.color}"></div>
+      <div style="flex:1">${it.text}</div>
+      <div style="color:var(--muted);white-space:nowrap">${it.mins<60?it.mins+'m ago':Math.round(it.mins/60)+'h ago'}</div>
+    </div>`).join('');
+}
+
+let currentTierFilter='ALL';
+function renderTierFilters(){
+  const names=['ALL',...TIERS.map(t=>t.name)];
+  document.getElementById('tierFilters').innerHTML=names.map(n=>`<button class="filter-btn ${n===currentTierFilter?'active':''}" onclick="currentTierFilter='${n.replace(/'/g,"\\'")}';renderTierFilters();renderClients()">${n}</button>`).join('');
+}
+
+function renderClients(){
+  const q=(document.getElementById('clientSearch').value||'').toLowerCase();
+  let f=clients.filter(c=>currentTierFilter==='ALL'||c.tier===currentTierFilter);
+  if(q)f=f.filter(c=>c.industry.toLowerCase().includes(q)||c.tier.toLowerCase().includes(q)||c.status.toLowerCase().includes(q)||c.region.toLowerCase().includes(q));
+  document.getElementById('clientBody').innerHTML=f.map(c=>`
+    <tr>
+      <td style="font-family:'Space Mono',monospace;color:var(--muted)">${c.id}</td>
+      <td>${c.industry}</td>
+      <td style="color:var(--text-dim)">${c.region}</td>
+      <td><span class="tier-badge" style="background:${c.tierColor}22;color:${c.tierColor};border:1px solid ${c.tierColor}">${c.tier}</span></td>
+      <td style="font-family:'Space Mono',monospace;color:var(--gold)">${c.monthly>0?fmtMoney(c.monthly):'Free tier'}</td>
+      <td><span class="status-dot" style="background:${c.statusColor}"></span>${c.status}</td>
+      <td style="font-size:11px;color:var(--text-dim)">${fmtDate(c.renewal)}</td>
+      <td style="font-family:'Space Mono',monospace;color:${c.health>80?'var(--green)':c.health>65?'var(--gold)':'var(--red)'}">${c.health}</td>
+    </tr>`).join('')||'<tr><td colspan="8" style="text-align:center;padding:20px;color:var(--muted)">No matching clients</td></tr>';
+}
+
+function renderRenewals(){
+  const now=new Date();
+  const upcoming=clients.map(c=>({...c,days:Math.round((c.renewal-now)/86400000)})).filter(c=>c.days>=0&&c.days<=45).sort((a,b)=>a.days-b.days);
+  document.getElementById('renewalBody').innerHTML=upcoming.map(c=>`
+    <tr>
+      <td style="font-family:'Space Mono',monospace;color:var(--muted)">${c.id}</td>
+      <td>${c.industry}</td>
+      <td><span class="tier-badge" style="background:${c.tierColor}22;color:${c.tierColor};border:1px solid ${c.tierColor}">${c.tier}</span></td>
+      <td style="font-family:'Space Mono',monospace;color:var(--gold)">${fmtMoney(c.monthly)}</td>
+      <td>${fmtDate(c.renewal)}</td>
+      <td style="color:${c.days<=7?'var(--red)':'var(--text-dim)'}">${c.days}d</td>
+    </tr>`).join('')||'<tr><td colspan="6" style="text-align:center;padding:20px;color:var(--muted)">No renewals in this window</td></tr>';
+}
+
+renderKPIs();renderPillars();renderRevChart();renderActivity();renderTierFilters();renderClients();renderRenewals();
+</script>
+</body>
+</html>
