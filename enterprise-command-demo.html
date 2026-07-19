@@ -23,6 +23,7 @@ label{display:block;font-size:10px;letter-spacing:1px;color:var(--gold);text-tra
 .btn-green{background:var(--green);color:#06210f;}
 .btn-red{background:transparent;border:1px solid var(--red);color:var(--red);}
 .btn-blue{background:var(--blue);color:#04121c;}
+.btn-teal{background:var(--teal);color:#04201c;}
 .card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:18px;}
 .pill{display:inline-block;padding:3px 10px;border-radius:5px;font-size:9px;font-weight:700;letter-spacing:0.5px;white-space:nowrap;}
 .toast{position:fixed;bottom:24px;right:24px;background:var(--gold);color:#0a0a0a;padding:11px 18px;border-radius:8px;font-size:12px;font-weight:700;opacity:0;transform:translateY(14px);transition:all .3s;z-index:999;pointer-events:none;}
@@ -138,6 +139,34 @@ tr.rowlink:hover td{background:#1c1a16;}
 .docs-block ul{margin:0 0 6px;padding-left:18px;font-size:12px;color:var(--text-dim);line-height:1.8;}
 .record-row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #1c1a16;gap:10px;flex-wrap:wrap;}
 .record-row:last-child{border:none;}
+
+/* ---------- CALENDAR ---------- */
+.cal-wrap{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px}
+.cal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px}
+.cal-nav{display:flex;align-items:center;gap:10px}
+.cal-nav-btn{background:var(--surface);border:1px solid var(--border);color:var(--text);width:34px;height:34px;border-radius:6px;cursor:pointer;font-size:15px;font-weight:700}
+.cal-nav-btn:hover{border-color:var(--gold);color:var(--gold)}
+.cal-month-label{font-size:15px;font-weight:800;letter-spacing:1px;min-width:150px;text-align:center}
+.cal-today-btn{background:var(--gold);color:#0a0a0a;border:none;padding:7px 14px;border-radius:6px;cursor:pointer;font-size:10px;font-weight:700;letter-spacing:1px}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
+.cal-dow{font-size:9px;font-weight:700;letter-spacing:1px;color:var(--text-dim);text-align:center;padding:4px 0}
+.cal-cell{background:var(--surface);border:1px solid var(--border);border-radius:6px;min-height:86px;padding:6px;display:flex;flex-direction:column;gap:3px}
+.cal-cell.empty{background:transparent;border:none}
+.cal-cell.today{border-color:var(--gold);border-width:2px}
+.cal-cell.has-overdue{border-color:var(--red);border-width:2px}
+.cal-daynum{font-size:10px;font-weight:700;color:var(--text-dim);font-family:'Space Mono',monospace}
+.cal-cell.today .cal-daynum{color:var(--gold)}
+.cal-pill{font-size:9px;padding:3px 6px;border-radius:4px;background:var(--border);color:var(--text);border:1px solid #3a3a3a;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer;font-weight:600}
+.cal-pill:hover{border-color:var(--gold)}
+.cal-more{font-size:9px;color:var(--gold);cursor:pointer;font-weight:700;padding:2px 6px;background:var(--border);border-radius:4px;display:inline-block}
+.cal-legend{display:flex;gap:12px;flex-wrap:wrap;margin-top:14px;padding-top:12px;border-top:1px solid var(--border);font-size:10px;color:var(--text-dim)}
+@media(max-width:768px){.cal-cell{min-height:68px;padding:4px}.cal-pill{font-size:8px}}
+
+/* ---------- AI ASSISTANT ---------- */
+.ai-chat-window{max-height:420px;overflow-y:auto;display:flex;flex-direction:column;gap:10px;margin-bottom:12px;padding-right:4px}
+.ai-bubble{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:12px 14px;font-size:12px;line-height:1.7;white-space:pre-wrap;max-width:92%;}
+.ai-bubble.user{align-self:flex-end;background:var(--border);}
+.ai-bubble.assistant{align-self:flex-start;border-left:3px solid var(--gold);}
 </style>
 </head>
 <body>
@@ -158,7 +187,7 @@ tr.rowlink:hover td{background:#1c1a16;}
 <div id="view-landing" class="wrap">
   <div class="eyebrow">Enterprise Digital Infrastructure</div>
   <h1 class="hero">One command centre runs the <span>entire enterprise.</span></h1>
-  <p class="lead">The Enterprise Command System is a single operating dashboard unifying bookings, stock, payroll, facilities, membership, brand, and executive reporting for high-ticket hospitality, retail, and service businesses — replacing a stack of disconnected spreadsheets and apps with one live system. Every department below runs its own full pipeline, message library, follow-up queue, call log, and archive — not just a shared inbox.</p>
+  <p class="lead">The Enterprise Command System is a single operating dashboard unifying bookings, stock, payroll, facilities, membership, brand, and executive reporting for high-ticket hospitality, retail, and service businesses — replacing a stack of disconnected spreadsheets and apps with one live system. Every department below runs its own full pipeline, calendar, message library, follow-up queue, call log, and archive — not just a shared inbox.</p>
   <div class="cta-row">
     <button class="btn btn-primary" onclick="setView('apply')">Apply for Enterprise Onboarding →</button>
     <button class="btn btn-ghost" onclick="setView('dashboard')">Open the live Command Centre</button>
@@ -302,14 +331,16 @@ const MODULES=[
 const MODULE_STAGES=['New','Contacted','Follow-Up','In Progress','Resolved','Rejected'];
 const STAGE_COLOR2={'New':'var(--blue)','Contacted':'var(--purple)','Follow-Up':'var(--gold)','In Progress':'var(--teal)','Resolved':'var(--green)','Rejected':'var(--red)'};
 
-// WhatsApp-style signal — a single at-a-glance status per record/contact.
+// WhatsApp-style signal — a single at-a-glance status per record/contact/client.
 const SIGNALS=[
   {key:'no_response', icon:'🔴', name:'No Response — Call Only', color:'var(--red)',    meaning:'Message delivered but never read. Switch to a direct call.'},
   {key:'unread',       icon:'🟡', name:'Delivered, Unread',       color:'#eab308',       meaning:'Sent but not opened yet. Wait before sending something new.'},
   {key:'read_noreply', icon:'🟠', name:'Read, No Reply',          color:'var(--orange)', meaning:'Seen, no response. Needs a different angle, not a repeat.'},
   {key:'active',       icon:'🟢', name:'Active Conversation',     color:'var(--green)',  meaning:'Currently exchanging messages — keep momentum.'},
   {key:'hot',          icon:'🔵', name:'Hot / Priority',          color:'var(--blue)',   meaning:'Time-sensitive — action today.'},
-  {key:'rejected',     icon:'⬛', name:'Rejected / Archived',     color:'var(--muted)',  meaning:'Declined or closed out. Lives in Archive, restorable.'}
+  {key:'client',       icon:'✅', name:'Client / Won',            color:'var(--green)',  meaning:'Converted — active client or won record.'},
+  {key:'rejected',     icon:'⬛', name:'Rejected / Archived',     color:'var(--muted)',  meaning:'Declined or closed out. Lives in Archive, restorable.'},
+  {key:'reengage',     icon:'🔄', name:'Re-engage / Outdated',    color:'var(--purple)', meaning:'Old lead — warm re-approach.'}
 ];
 function signalFor(key){return SIGNALS.find(s=>s.key===key)||SIGNALS[1];}
 function weightedSignalKey(){
@@ -324,7 +355,7 @@ function randInt(min,max){return Math.floor(rand()*(max-min+1))+min;}
 function weightedPick(list){const total=list.reduce((s,x)=>s+x.weight,0);let r=rand()*total;for(const x of list){if(r<x.weight)return x;r-=x.weight;}return list[0];}
 function uid(prefix){return prefix+'-'+Math.random().toString(36).slice(2,7).toUpperCase();}
 function fmtMoney(n){return 'GH₵ '+Math.round(n).toLocaleString();}
-function fmtDate(d){const dt=(d instanceof Date)?d:new Date(d);return dt.toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'});}
+function fmtDate(d){if(!d)return'—';const dt=(d instanceof Date)?d:new Date(d);if(isNaN(dt.getTime()))return'—';return dt.toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'});}
 function todayStr(){return new Date().toISOString().slice(0,10);}
 function isToday(ts){return new Date(ts).toISOString().slice(0,10)===todayStr();}
 function daysBetween(a,b){return Math.round((new Date(a)-new Date(b))/86400000);}
@@ -345,7 +376,7 @@ async function copyText(text){
   catch(e){ showToast('Copy failed — select and copy manually'); }
 }
 
-let state={clients:[],activity:[],records:[],calls:[],dailyOutreach:[],messageLibrary:{},tiers:TIERS,
+let state={clients:[],activity:[],records:[],calls:[],dailyOutreach:[],waStatusViews:[],calendarEvents:[],messageLibrary:{},playbook:'',tiers:TIERS,
   view:'landing',dashTab:'overview',selectedClientId:null,selectedModuleId:null,moduleTab:'overview',
   selectedRecordId:null,pipelineHighlight:null};
 
@@ -363,11 +394,19 @@ function seedClients(){
     const renewal=new Date(today.getTime()+randInt(-10,150)*86400000);
     const created=new Date(today.getTime()-randInt(30,700)*86400000);
     const activeModules=MODULES.filter(()=>rand()>0.35).map(m=>m.id);
+    const msgCount=randInt(0,9);
+    const lastContact=new Date(today.getTime()-randInt(0,30)*86400000);
+    const nextFollowUp=new Date(today.getTime()+randInt(-5,20)*86400000);
     out.push({
       id:uid('ECS'),name:'Client — '+pick(INDUSTRIES)+' Account '+i,industry:pick(INDUSTRIES),region:pick(REGIONS),
       tierKey:tier.key,stage:stage,contractValue:tier.build,monthly:tier.monthly,
       health:randInt(55,99),renewal:renewal.toISOString(),created:created.toISOString(),
-      modules:activeModules,notes:'',contactName:'',contactNumber:''
+      modules:activeModules,notes:'',contactName:'',contactNumber:'',
+      waLabel: stage==='Active'?'client':(stage==='Churned'?'rejected':weightedSignalKey()),
+      lastContact:lastContact.toISOString().slice(0,10),
+      nextFollowUp:nextFollowUp.toISOString().slice(0,10),
+      messageCount:msgCount,
+      firstConversationAt: msgCount>2 ? (msgCount) : null // messages-before-conversation marker
     });
   }
   return out;
@@ -397,6 +436,7 @@ function seedRecords(clients){
         detail:'Auto-generated demo record for '+m.title.toLowerCase()+' on '+c.name+'.',
         stage:stage, waSignal:weightedSignalKey(), archived:stage==='Rejected',
         nextFollowUp:new Date(fu).toISOString().slice(0,10), notes:'',
+        messageCount:randInt(0,6),
         history:[{ts:created,text:'Record created.'}],
         ts:created
       });
@@ -417,7 +457,27 @@ function seedCalls(records){
 }
 function seedDailyOutreach(){
   const out=[];
-  for(let i=0;i<20;i++){ out.push({id:uid('OUT'),note:'WhatsApp message sent',ts:Date.now()-randInt(0,10)*86400000}); }
+  const types=['WhatsApp','Call','Email','DM','Comment'];
+  for(let i=0;i<40;i++){ out.push({id:uid('OUT'),type:pick(types),note:'Outreach sent',ts:Date.now()-randInt(0,400)*86400000}); }
+  return out;
+}
+function seedWaStatusViews(clients){
+  const out=[];
+  for(let i=0;i<15;i++){
+    const c=pick(clients);
+    out.push({id:uid('WSV'),clientId:c.id,clientName:c.name,ts:Date.now()-randInt(0,60)*86400000,note:'Viewed WhatsApp status'});
+  }
+  return out.sort((a,b)=>b.ts-a.ts);
+}
+function seedCalendarEvents(clients){
+  const out=[];
+  const today=new Date();
+  const titles=['Onboarding call','Site visit','Contract renewal review','Payroll cycle sign-off','Executive report walkthrough','Follow-up call','Facilities inspection','Staff SOP training session'];
+  for(let i=0;i<18;i++){
+    const c=pick(clients);
+    const d=new Date(today.getTime()+randInt(-10,25)*86400000);
+    out.push({id:uid('EVT'),clientId:c.id,clientName:c.name,title:pick(titles),date:d.toISOString().slice(0,10),time:['09:00','11:00','14:00','16:00'][randInt(0,3)],module:pick(MODULES).id,notes:'',created:Date.now()});
+  }
   return out;
 }
 function seedMessageLibrary(){
@@ -513,25 +573,34 @@ function seedMessageLibrary(){
    PERSISTENCE (window.storage — shared across this artifact)
    ============================================================ */
 async function loadState(){
-  try{ const c=await window.storage.get('ecs_clients_v4'); state.clients=JSON.parse(c.value); }
+  try{ const c=await window.storage.get('ecs_clients_v5'); state.clients=JSON.parse(c.value); }
   catch(e){ state.clients=seedClients(); await saveClients(); }
-  try{ const a=await window.storage.get('ecs_activity_v4'); state.activity=JSON.parse(a.value); }
+  try{ const a=await window.storage.get('ecs_activity_v5'); state.activity=JSON.parse(a.value); }
   catch(e){ state.activity=seedActivity(state.clients); await saveActivity(); }
-  try{ const r=await window.storage.get('ecs_records_v4'); state.records=JSON.parse(r.value); }
+  try{ const r=await window.storage.get('ecs_records_v5'); state.records=JSON.parse(r.value); }
   catch(e){ state.records=seedRecords(state.clients); await saveRecords(); }
-  try{ const cl=await window.storage.get('ecs_calls_v4'); state.calls=JSON.parse(cl.value); }
+  try{ const cl=await window.storage.get('ecs_calls_v5'); state.calls=JSON.parse(cl.value); }
   catch(e){ state.calls=seedCalls(state.records); await saveCalls(); }
-  try{ const d=await window.storage.get('ecs_outreach_v4'); state.dailyOutreach=JSON.parse(d.value); }
+  try{ const d=await window.storage.get('ecs_outreach_v5'); state.dailyOutreach=JSON.parse(d.value); }
   catch(e){ state.dailyOutreach=seedDailyOutreach(); await saveOutreach(); }
-  try{ const ml=await window.storage.get('ecs_msglib_v4'); state.messageLibrary=JSON.parse(ml.value); }
+  try{ const wv=await window.storage.get('ecs_wastatusviews_v5'); state.waStatusViews=JSON.parse(wv.value); }
+  catch(e){ state.waStatusViews=seedWaStatusViews(state.clients); await saveWaStatusViews(); }
+  try{ const ce=await window.storage.get('ecs_calendarevents_v5'); state.calendarEvents=JSON.parse(ce.value); }
+  catch(e){ state.calendarEvents=seedCalendarEvents(state.clients); await saveCalendarEvents(); }
+  try{ const ml=await window.storage.get('ecs_msglib_v5'); state.messageLibrary=JSON.parse(ml.value); }
   catch(e){ state.messageLibrary=seedMessageLibrary(); await saveMessageLibrary(); }
+  try{ const pb=await window.storage.get('ecs_playbook_v5'); state.playbook=pb.value; }
+  catch(e){ state.playbook=''; }
 }
-async function saveClients(){ try{ await window.storage.set('ecs_clients_v4', JSON.stringify(state.clients)); }catch(e){} }
-async function saveActivity(){ try{ await window.storage.set('ecs_activity_v4', JSON.stringify(state.activity)); }catch(e){} }
-async function saveRecords(){ try{ await window.storage.set('ecs_records_v4', JSON.stringify(state.records)); }catch(e){} }
-async function saveCalls(){ try{ await window.storage.set('ecs_calls_v4', JSON.stringify(state.calls)); }catch(e){} }
-async function saveOutreach(){ try{ await window.storage.set('ecs_outreach_v4', JSON.stringify(state.dailyOutreach)); }catch(e){} }
-async function saveMessageLibrary(){ try{ await window.storage.set('ecs_msglib_v4', JSON.stringify(state.messageLibrary)); }catch(e){} }
+async function saveClients(){ try{ await window.storage.set('ecs_clients_v5', JSON.stringify(state.clients)); }catch(e){} }
+async function saveActivity(){ try{ await window.storage.set('ecs_activity_v5', JSON.stringify(state.activity)); }catch(e){} }
+async function saveRecords(){ try{ await window.storage.set('ecs_records_v5', JSON.stringify(state.records)); }catch(e){} }
+async function saveCalls(){ try{ await window.storage.set('ecs_calls_v5', JSON.stringify(state.calls)); }catch(e){} }
+async function saveOutreach(){ try{ await window.storage.set('ecs_outreach_v5', JSON.stringify(state.dailyOutreach)); }catch(e){} }
+async function saveWaStatusViews(){ try{ await window.storage.set('ecs_wastatusviews_v5', JSON.stringify(state.waStatusViews)); }catch(e){} }
+async function saveCalendarEvents(){ try{ await window.storage.set('ecs_calendarevents_v5', JSON.stringify(state.calendarEvents)); }catch(e){} }
+async function saveMessageLibrary(){ try{ await window.storage.set('ecs_msglib_v5', JSON.stringify(state.messageLibrary)); }catch(e){} }
+async function savePlaybook(){ try{ await window.storage.set('ecs_playbook_v5', state.playbook||''); }catch(e){} }
 
 function addActivity(clientId,clientName,text){
   state.activity.unshift({id:uid('ACT'),clientId,clientName,text,ts:Date.now()});
@@ -619,7 +688,9 @@ async function submitApplication(){
     id:uid('ECS'),name,industry,region,tierKey:tier.key,stage:'Prospect',
     contractValue:tier.build,monthly:tier.monthly,health:70,
     renewal:new Date(Date.now()+365*86400000).toISOString(),created:new Date().toISOString(),
-    modules:[],notes:notes,contactName:contact,contactNumber:number
+    modules:[],notes:notes,contactName:contact,contactNumber:number,
+    waLabel:'unread',lastContact:todayStr(),nextFollowUp:new Date(Date.now()+2*86400000).toISOString().slice(0,10),
+    messageCount:0,firstConversationAt:null
   };
   state.clients.unshift(c);
   await saveClients();
@@ -644,8 +715,11 @@ const DASH_TABS=[
   {id:'pipeline',label:'PIPELINE'},
   {id:'clients',label:'CLIENTS'},
   {id:'modules',label:'DEPARTMENTS'},
+  {id:'calendar',label:'📅 CALENDAR'},
   {id:'outreach',label:'DAILY OUTREACH'},
   {id:'revenue',label:'REVENUE'},
+  {id:'analytics',label:'📊 SUMMARY'},
+  {id:'ai',label:'🤖 AI ASSISTANT'},
   {id:'activity',label:'ACTIVITY LOG'},
   {id:'archive',label:'ARCHIVE'},
   {id:'addclient',label:'+ ADD CLIENT'},
@@ -659,8 +733,11 @@ function renderDashboard(){
   else if(state.dashTab==='pipeline')body.innerHTML=renderPipeline();
   else if(state.dashTab==='clients')body.innerHTML=renderClientsTab();
   else if(state.dashTab==='modules')body.innerHTML=renderModulesTab();
+  else if(state.dashTab==='calendar'){body.innerHTML=renderCalendarTab();renderGlobalCalendarGrid();}
   else if(state.dashTab==='outreach')body.innerHTML=renderOutreachTab();
   else if(state.dashTab==='revenue')body.innerHTML=renderRevenueTab();
+  else if(state.dashTab==='analytics')body.innerHTML=renderAnalyticsTab();
+  else if(state.dashTab==='ai'){body.innerHTML=renderAITab();renderAIQuickPrompts();}
   else if(state.dashTab==='activity')body.innerHTML=renderActivityTab();
   else if(state.dashTab==='archive')body.innerHTML=renderGlobalArchiveTab();
   else if(state.dashTab==='addclient')body.innerHTML=renderAddClientTab();
@@ -685,6 +762,8 @@ function renderOverview(){
   const msgsToday=state.dailyOutreach.filter(o=>isToday(o.ts)).length;
   const followupsDueToday=state.records.filter(r=>r.stage!=='Resolved'&&r.stage!=='Rejected'&&r.nextFollowUp<=todayStr()).length;
   const callsToday=state.calls.filter(c=>isToday(c.ts)).length;
+  const eventsToday=state.calendarEvents.filter(e=>e.date===todayStr()).length;
+  const coldNoConvo=state.clients.filter(c=>(c.messageCount||0)>0 && !c.firstConversationAt && c.waLabel!=='client').length;
 
   return `
     <div class="kpi-grid">
@@ -698,6 +777,8 @@ function renderOverview(){
       <div class="kpi" style="--accent:var(--orange)"><div class="label">MESSAGES SENT TODAY</div><div class="value">${msgsToday}</div><div class="sub">${state.dailyOutreach.length} all-time — see Daily Outreach</div></div>
       <div class="kpi" style="--accent:var(--gold)"><div class="label">FOLLOW-UPS DUE TODAY</div><div class="value">${followupsDueToday}</div><div class="sub">across all 7 departments</div></div>
       <div class="kpi" style="--accent:var(--blue)"><div class="label">CALLS LOGGED TODAY</div><div class="value">${callsToday}</div><div class="sub">see any department → Calls</div></div>
+      <div class="kpi" style="--accent:var(--teal)"><div class="label">CALENDAR EVENTS TODAY</div><div class="value">${eventsToday}</div><div class="sub">appointments &amp; follow-ups</div></div>
+      <div class="kpi" style="--accent:var(--red)"><div class="label">COLD — NO CONVERSATION YET</div><div class="value">${coldNoConvo}</div><div class="sub">messaged but never replied</div></div>
     </div>
     <div class="grid-2">
       <div class="card">
@@ -725,7 +806,7 @@ function renderPipeline(){
       return `<div class="card" style="border-top:2px solid ${STAGE_COLOR[stage]}">
         <div style="font-size:11px;font-weight:700;letter-spacing:1px;color:${STAGE_COLOR[stage]};margin-bottom:10px">${stage.toUpperCase()} (${items.length})</div>
         ${items.slice(0,25).map(c=>`<div class="card" style="padding:10px;margin-bottom:8px;${c.id===state.pipelineHighlight?'border-color:var(--gold)':''};cursor:pointer" onclick="openClient('${c.id}')">
-          <div style="font-size:11px;font-weight:700">${c.name}</div>
+          <div style="font-size:11px;font-weight:700">${signalFor(c.waLabel).icon} ${c.name}</div>
           <div style="font-size:10px;color:var(--muted);margin-top:3px">${c.industry} · ${c.region||''}</div>
           <div class="mono" style="font-size:10px;color:var(--gold);margin-top:5px">${fmtMoney(c.contractValue)}</div>
         </div>`).join('')||'<div style="font-size:11px;color:var(--muted)">Empty</div>'}
@@ -742,7 +823,7 @@ function renderClientsTab(){
     <div class="filter-row" id="clientFilterRow">${['ALL',...STAGES].map(s=>`<button class="filter-btn ${clientFilter===s?'active':''}" onclick="clientFilter='${s}';renderInto()">${s}</button>`).join('')}</div>
     <div class="filter-row">${['ALL',...REGIONS].map(r=>`<button class="filter-btn ${clientRegionFilter===r?'active':''}" onclick="clientRegionFilter='${r}';renderInto()">${r}</button>`).join('')}</div>
     <div class="card"><div class="scroll-table"><table>
-      <thead><tr><th>ID</th><th>Client</th><th>Industry</th><th>Region</th><th>Stage</th><th>Tier</th><th>MRR</th><th>Contract Value</th><th>Health</th></tr></thead>
+      <thead><tr><th>ID</th><th>Client</th><th>Industry</th><th>Region</th><th>Stage</th><th>WA Label</th><th>Tier</th><th>MRR</th><th>Joined</th><th>Last Contact</th><th>Next Follow-Up</th><th>Msgs Sent</th><th>Health</th></tr></thead>
       <tbody id="clientsBody"></tbody>
     </table></div></div>
   `;
@@ -755,21 +836,27 @@ function renderClientsBody(){
   if(q)list=list.filter(c=>c.name.toLowerCase().includes(q)||c.industry.toLowerCase().includes(q)||(c.region||'').toLowerCase().includes(q)||c.stage.toLowerCase().includes(q));
   tbody.innerHTML=list.map(c=>{
     const tier=state.tiers.find(t=>t.key===c.tierKey)||state.tiers[0];
+    const sig=signalFor(c.waLabel);
     return `<tr class="rowlink" onclick="openClient('${c.id}')">
       <td class="mono" style="color:var(--muted)">${c.id}</td>
       <td>${c.name}</td><td>${c.industry}</td><td style="color:var(--text-dim)">${c.region}</td>
       <td><span class="pill" style="background:${STAGE_COLOR[c.stage]}22;color:${STAGE_COLOR[c.stage]};border:1px solid ${STAGE_COLOR[c.stage]}">${c.stage}</span></td>
+      <td><span class="sig-pill" style="color:${sig.color}" title="${sig.meaning}">${sig.icon} ${sig.name}</span></td>
       <td style="font-size:10px">${tier.name}</td>
       <td class="mono" style="color:var(--gold)">${fmtMoney(c.monthly)}</td>
-      <td class="mono">${fmtMoney(c.contractValue)}</td>
+      <td style="font-size:10px">${fmtDate(c.created)}</td>
+      <td style="font-size:10px">${fmtDate(c.lastContact)}</td>
+      <td style="font-size:10px;color:${c.nextFollowUp&&c.nextFollowUp<=todayStr()?'var(--red)':'var(--text-dim)'}">${fmtDate(c.nextFollowUp)}</td>
+      <td class="mono" style="text-align:center">${c.messageCount||0}${(!c.firstConversationAt&&(c.messageCount||0)>0)?' <span style="color:var(--red)" title="No reply yet">⚠</span>':''}</td>
       <td class="mono" style="color:${c.health>80?'var(--green)':c.health>65?'var(--gold)':'var(--red)'}">${c.health}</td>
     </tr>`;
-  }).join('')||'<tr><td colspan="9" style="text-align:center;padding:20px;color:var(--muted)">No matching clients</td></tr>';
+  }).join('')||'<tr><td colspan="13" style="text-align:center;padding:20px;color:var(--muted)">No matching clients</td></tr>';
 }
 
 /* ============================================================
    DEPARTMENTS (MODULES) — each with its own full workspace:
-   Overview, Pipeline, Follow-Ups, Calls, Messages, Archive, Docs
+   Overview, Pipeline, Calendar, Daily Tasks, Follow-Ups, Calls,
+   Messages, Archive, Docs
    ============================================================ */
 function renderModulesTab(){
   if(state.selectedModuleId)return renderModuleWorkspace(state.selectedModuleId);
@@ -788,12 +875,14 @@ function renderModulesTab(){
 }
 function openModule(id){ state.selectedModuleId=id; state.moduleTab='overview'; setDashTabQuiet('modules'); renderDashboard(); }
 function setDashTabQuiet(t){ state.dashTab=t; }
-function setModuleTab(tab){ state.moduleTab=tab; renderDashboard(); }
+function setModuleTab(tab){ state.moduleTab=tab; renderDashboard(); if(tab==='calendar')renderModCalendarGrid(state.selectedModuleId); }
 function backToModules(){ state.selectedModuleId=null; renderDashboard(); }
 
 const MODULE_SUBTABS=[
   {id:'overview',label:'OVERVIEW'},
   {id:'pipeline',label:'PIPELINE'},
+  {id:'calendar',label:'📅 CALENDAR'},
+  {id:'dailytasks',label:'✅ DAILY TASKS'},
   {id:'followups',label:'FOLLOW-UPS'},
   {id:'calls',label:'CALLS'},
   {id:'messages',label:'MESSAGES'},
@@ -806,6 +895,8 @@ function renderModuleWorkspace(id){
   let body='';
   if(state.moduleTab==='overview')body=renderModOverview(m,recs);
   else if(state.moduleTab==='pipeline')body=renderModPipeline(m,recs);
+  else if(state.moduleTab==='calendar')body=renderModCalendarTab(m,recs);
+  else if(state.moduleTab==='dailytasks')body=renderModDailyTasks(m,recs);
   else if(state.moduleTab==='followups')body=renderModFollowUps(m,recs);
   else if(state.moduleTab==='calls')body=renderModCalls(m,recs);
   else if(state.moduleTab==='messages')body=renderModMessages(m);
@@ -824,7 +915,6 @@ function renderModOverview(m,recs){
   const open=recs.filter(r=>r.stage!=='Resolved'&&r.stage!=='Rejected');
   const due=recs.filter(r=>r.stage!=='Resolved'&&r.stage!=='Rejected'&&r.nextFollowUp<=todayStr());
   const archived=recs.filter(r=>r.stage==='Rejected'||r.archived);
-  const msgsToday=state.dailyOutreach.filter(o=>isToday(o.ts)).length; // shared counter across departments
   const callsForModule=state.calls.filter(c=>c.module===m.id);
   const byRegion={};
   recs.forEach(r=>{byRegion[r.region||'—']=(byRegion[r.region||'—']||0)+1;});
@@ -877,7 +967,7 @@ function renderModPipeline(m,recs){
           <div class="khead">${stage.toUpperCase()} (${items.length})</div>
           ${items.map(r=>`<div class="kcard" onclick="openRecordModal('${r.id}')">
             <div class="kc-title">${r.title}</div>
-            <div class="kc-sub">${r.clientName} · ${r.region||'—'}</div>
+            <div class="kc-sub">${r.clientName} · ${r.region||'—'} · msgs:${r.messageCount||0}</div>
             <div style="margin-top:6px"><span class="sig-pill" style="color:${signalFor(r.waSignal).color}">${signalFor(r.waSignal).icon}</span></div>
           </div>`).join('')||'<div style="font-size:10px;color:var(--muted)">Empty</div>'}
         </div>`;
@@ -909,7 +999,7 @@ async function createRecord(moduleId){
   if(!title){ showToast('Add a title first'); return; }
   const client=state.clients.find(c=>c.id===clientId);
   const rec={id:uid('REC'),module:moduleId,clientId,clientName:client?client.name:'—',region,
-    title,detail:detail||'—',stage:'New',waSignal:'unread',archived:false,
+    title,detail:detail||'—',stage:'New',waSignal:'unread',archived:false,messageCount:0,
     nextFollowUp:fu,notes:'',history:[{ts:Date.now(),text:'Record created.'}],ts:Date.now()};
   state.records.unshift(rec);
   await saveRecords();
@@ -940,6 +1030,7 @@ function openRecordModal(id){
           <div><div class="k">WhatsApp signal</div><select onchange="updateRecordField('${r.id}','waSignal',this.value)">${SIGNALS.map(s=>`<option value="${s.key}" ${s.key===r.waSignal?'selected':''}>${s.icon} ${s.name}</option>`).join('')}</select></div>
           <div><div class="k">Region</div><select onchange="updateRecordField('${r.id}','region',this.value)">${REGIONS.map(rg=>`<option ${rg===r.region?'selected':''}>${rg}</option>`).join('')}</select></div>
           <div><div class="k">Next follow-up</div><input type="date" value="${r.nextFollowUp||''}" onchange="updateRecordField('${r.id}','nextFollowUp',this.value)"></div>
+          <div><div class="k">Messages sent</div><div class="v mono" style="color:var(--teal)">${r.messageCount||0}</div></div>
         </div>
         <div class="k">Detail</div><div class="v" style="font-size:12px;color:var(--text-dim);margin-bottom:10px">${escapeHtml(r.detail)}</div>
         <div class="k">Notes</div>
@@ -952,8 +1043,8 @@ function openRecordModal(id){
         <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap">
           <button class="btn btn-ghost btn-sm" onclick="pickTemplateInto('${r.id}')">Load selected</button>
           <button class="btn btn-ghost btn-sm" onclick="copyText(document.getElementById('rec_msg_body').value)">Copy</button>
-          <a class="btn btn-green btn-sm" href="${waLink(client?client.contactNumber:'','')}" onclick="event.preventDefault();window.open(waLink(client?client.contactNumber:'',document.getElementById('rec_msg_body').value),'_blank');logOutreach('${r.id}')">WhatsApp</a>
-          <button class="btn btn-blue btn-sm" onclick="logOutreach('${r.id}')">Log as sent</button>
+          <a class="btn btn-green btn-sm" href="${waLink(client?client.contactNumber:'','')}" onclick="event.preventDefault();window.open(waLink(client?client.contactNumber:'',document.getElementById('rec_msg_body').value),'_blank');logOutreach('${r.id}','WhatsApp')">WhatsApp</a>
+          <button class="btn btn-blue btn-sm" onclick="logOutreach('${r.id}','WhatsApp')">Log as sent</button>
         </div>
 
         <div class="section-title">History</div>
@@ -994,14 +1085,106 @@ async function saveRecordNote(id){
   await saveRecords();
   showToast('Note saved');
 }
-async function logOutreach(recId){
+async function logOutreach(recId,type){
   const r=state.records.find(x=>x.id===recId);
-  state.dailyOutreach.unshift({id:uid('OUT'),note:r?('Message re: '+r.title):'WhatsApp message',ts:Date.now()});
+  const t=type||'WhatsApp';
+  state.dailyOutreach.unshift({id:uid('OUT'),type:t,note:r?(t+' re: '+r.title):(t+' message'),ts:Date.now(),recordId:recId,clientId:r?r.clientId:null});
   await saveOutreach();
-  if(r){ addRecordHistory(r,'Message logged as sent.'); await saveRecords(); addActivity(r.clientId,r.clientName,'Message sent re: '+r.title); }
+  if(r){
+    r.messageCount=(r.messageCount||0)+1;
+    addRecordHistory(r,t+' logged as sent.');
+    await saveRecords();
+    addActivity(r.clientId,r.clientName,t+' sent re: '+r.title);
+    const client=state.clients.find(c=>c.id===r.clientId);
+    if(client){
+      client.messageCount=(client.messageCount||0)+1;
+      client.lastContact=todayStr();
+      await saveClients();
+    }
+  }
   showToast('Logged in Daily Outreach');
 }
 function closeModal(){ document.getElementById('modalRoot').innerHTML=''; state.selectedRecordId=null; }
+
+/* ---- module: calendar ---- */
+function renderModCalendarTab(m,recs){
+  return `
+    <div class="doc-note">Every ${m.title} record with a Next Follow-Up date, plus any manually added appointment for this department, shows here. Add an appointment below.</div>
+    <div class="card" style="margin-bottom:16px">
+      <div class="form-row2">
+        <div><label>Title</label><input id="modevt_title_${m.id}" placeholder="e.g. Site visit, renewal call"></div>
+        <div><label>Client</label><select id="modevt_client_${m.id}">${state.clients.map(c=>`<option value="${c.id}">${c.name}</option>`).join('')}</select></div>
+      </div>
+      <div class="form-row2">
+        <div><label>Date</label><input id="modevt_date_${m.id}" type="date" value="${todayStr()}"></div>
+        <div><label>Time</label><input id="modevt_time_${m.id}" type="time" value="09:00"></div>
+      </div>
+      <button class="btn btn-primary btn-sm" style="margin-top:10px" onclick="addModuleCalendarEvent('${m.id}')">+ Add appointment</button>
+    </div>
+    <div id="modCalGrid_${m.id}"></div>
+  `;
+}
+let modCalMonth={}, modCalYear={};
+function renderModCalendarGrid(moduleId){
+  const gridEl=document.getElementById('modCalGrid_'+moduleId);
+  if(!gridEl)return;
+  const now=new Date();
+  if(modCalMonth[moduleId]===undefined){modCalMonth[moduleId]=now.getMonth();modCalYear[moduleId]=now.getFullYear();}
+  gridEl.innerHTML=buildCalendarHtml(modCalYear[moduleId],modCalMonth[moduleId],
+    (dateKey)=>{
+      const recItems=state.records.filter(r=>r.module===moduleId&&r.nextFollowUp===dateKey&&r.stage!=='Resolved'&&r.stage!=='Rejected').map(r=>({label:'📌 '+r.clientName+' — '+r.title,onclick:`openRecordModal('${r.id}')`}));
+      const evtItems=state.calendarEvents.filter(e=>e.module===moduleId&&e.date===dateKey).map(e=>({label:'🗓 '+e.title+' — '+e.clientName,onclick:`showCalendarEventInfo('${e.id}')`}));
+      return recItems.concat(evtItems);
+    },'modcal_'+moduleId,moduleId);
+}
+async function addModuleCalendarEvent(moduleId){
+  const title=document.getElementById('modevt_title_'+moduleId).value.trim();
+  const clientId=document.getElementById('modevt_client_'+moduleId).value;
+  const date=document.getElementById('modevt_date_'+moduleId).value||todayStr();
+  const time=document.getElementById('modevt_time_'+moduleId).value||'09:00';
+  if(!title){showToast('Add a title first');return;}
+  const client=state.clients.find(c=>c.id===clientId);
+  const evt={id:uid('EVT'),clientId,clientName:client?client.name:'—',title,date,time,module:moduleId,notes:'',created:Date.now()};
+  state.calendarEvents.unshift(evt);
+  await saveCalendarEvents();
+  addActivity(clientId,evt.clientName,'Calendar appointment added: '+title+' on '+fmtDate(date));
+  showToast('Appointment added');
+  document.getElementById('modevt_title_'+moduleId).value='';
+  renderModCalendarGrid(moduleId);
+}
+function calNavModModule(moduleId,dir){
+  modCalMonth[moduleId]+=dir;
+  if(modCalMonth[moduleId]<0){modCalMonth[moduleId]=11;modCalYear[moduleId]--;}
+  if(modCalMonth[moduleId]>11){modCalMonth[moduleId]=0;modCalYear[moduleId]++;}
+  renderModCalendarGrid(moduleId);
+}
+function calGoTodayMod(moduleId){const d=new Date();modCalMonth[moduleId]=d.getMonth();modCalYear[moduleId]=d.getFullYear();renderModCalendarGrid(moduleId);}
+function showCalendarEventInfo(id){
+  const e=state.calendarEvents.find(x=>x.id===id);
+  if(!e)return;
+  alert(e.title+'\n'+e.clientName+'\n'+fmtDate(e.date)+' at '+(e.time||'—')+(e.notes?'\n\n'+e.notes:''));
+}
+
+/* ---- module: daily tasks ---- */
+function renderModDailyTasks(m,recs){
+  const dueToday=recs.filter(r=>r.stage!=='Resolved'&&r.stage!=='Rejected'&&r.nextFollowUp<=todayStr());
+  const eventsToday=state.calendarEvents.filter(e=>e.module===m.id&&e.date===todayStr());
+  const callsToday=state.calls.filter(c=>c.module===m.id&&isToday(c.ts));
+  return `
+    <div class="doc-note">Everything that needs attention in ${m.title} today, in one checklist — follow-ups due, appointments scheduled, and calls already logged.</div>
+    <div class="kpi-grid">
+      <div class="kpi" style="--accent:var(--gold)"><div class="label">FOLLOW-UPS DUE TODAY</div><div class="value">${dueToday.length}</div></div>
+      <div class="kpi" style="--accent:var(--teal)"><div class="label">APPOINTMENTS TODAY</div><div class="value">${eventsToday.length}</div></div>
+      <div class="kpi" style="--accent:var(--blue)"><div class="label">CALLS LOGGED TODAY</div><div class="value">${callsToday.length}</div></div>
+    </div>
+    <div class="section-title">Follow-ups due today</div>
+    ${dueToday.map(r=>`<div class="activity-item"><div class="dot" style="background:${signalFor(r.waSignal).color}"></div><div style="flex:1;cursor:pointer" onclick="openRecordModal('${r.id}')">${r.clientName} — ${r.title}</div><span class="pill" style="background:${STAGE_COLOR2[r.stage]}22;color:${STAGE_COLOR2[r.stage]};border:1px solid ${STAGE_COLOR2[r.stage]}">${r.stage}</span></div>`).join('')||'<div style="color:var(--muted);font-size:12px">Nothing due today.</div>'}
+    <div class="section-title">Appointments today</div>
+    ${eventsToday.map(e=>`<div class="activity-item"><div class="dot" style="background:var(--teal)"></div><div style="flex:1">${e.time||''} — ${e.clientName}: ${e.title}</div></div>`).join('')||'<div style="color:var(--muted);font-size:12px">No appointments scheduled today.</div>'}
+    <div class="section-title">Calls logged today</div>
+    ${callsToday.map(c=>`<div class="activity-item"><div class="dot" style="background:var(--blue)"></div><div style="flex:1">${c.clientName} — ${c.outcome}</div></div>`).join('')||'<div style="color:var(--muted);font-size:12px">No calls logged today yet.</div>'}
+  `;
+}
 
 /* ---- module: follow-ups ---- */
 function renderModFollowUps(m,recs){
@@ -1016,13 +1199,13 @@ function renderModFollowUps(m,recs){
       const body=fuTemplate?personalize(fuTemplate.body,client,r):'';
       return `<div class="followup-row">
         <div class="fu-head">
-          <div><b>${r.title}</b> <span style="color:var(--muted);font-size:11px">— ${r.clientName} · ${r.region||'—'}</span></div>
+          <div><b>${r.title}</b> <span style="color:var(--muted);font-size:11px">— ${r.clientName} · ${r.region||'—'} · msgs:${r.messageCount||0}</span></div>
           <span class="pill" style="background:${STAGE_COLOR2[r.stage]}22;color:${STAGE_COLOR2[r.stage]};border:1px solid ${STAGE_COLOR2[r.stage]}">${r.stage}</span>
         </div>
         <textarea rows="2" id="fu_body_${r.id}">${escapeHtml(body)}</textarea>
         <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap">
           <button class="btn btn-ghost btn-sm" onclick="copyText(document.getElementById('fu_body_${r.id}').value)">Copy</button>
-          <button class="btn btn-green btn-sm" onclick="window.open(waLink('${client?client.contactNumber:''}',document.getElementById('fu_body_${r.id}').value),'_blank');logOutreach('${r.id}')">WhatsApp</button>
+          <button class="btn btn-green btn-sm" onclick="window.open(waLink('${client?client.contactNumber:''}',document.getElementById('fu_body_${r.id}').value),'_blank');logOutreach('${r.id}','WhatsApp')">WhatsApp</button>
           <button class="btn btn-blue btn-sm" onclick="advanceFollowUp('${r.id}')">✓ Done — advance stage</button>
           <button class="btn btn-ghost btn-sm" onclick="snoozeFollowUp('${r.id}')">Snooze 3 days</button>
           <button class="btn btn-red btn-sm" onclick="rejectRecord('${r.id}')">✕ Reject</button>
@@ -1093,6 +1276,7 @@ async function logCall(moduleId){
     outcome,notes:notes||'—',nextAction:nextAction||'—',ts:Date.now()};
   state.calls.unshift(call);
   await saveCalls();
+  await logOutreach(recordId,'Call');
   if(r){ addRecordHistory(r,'Call logged: '+outcome+(notes?(' — '+notes):'')); await saveRecords(); addActivity(r.clientId,r.clientName,'Call logged on '+m_label(moduleId)+' item "'+r.title+'": '+outcome); }
   showToast('Call logged');
   renderDashboard();
@@ -1169,8 +1353,10 @@ function renderModDocs(m){
         <ul>
           <li><b>Overview</b> — open/due/archived counts, region and signal breakdown, and the danger-zone reset.</li>
           <li><b>Pipeline</b> — kanban of every record by stage (New → Contacted → Follow-Up → In Progress → Resolved). Click a card for the full record.</li>
+          <li><b>Calendar</b> — monthly grid of this department's follow-up dates and manually scheduled appointments.</li>
+          <li><b>Daily Tasks</b> — everything due today in this department: follow-ups, appointments, calls.</li>
           <li><b>Follow-Ups</b> — everything due today or overdue, with a ready-to-send message, WhatsApp button, and one-tap Done / Snooze / Reject.</li>
-          <li><b>Calls</b> — log every phone conversation tied to a record; appears in that record's history automatically.</li>
+          <li><b>Calls</b> — log every phone conversation tied to a record; appears in that record's history automatically and counts toward Daily Outreach.</li>
           <li><b>Messages</b> — the editable wording library for Cold, Follow-Up, and Objection-handling messages specific to this department.</li>
           <li><b>Archive</b> — rejected or closed items; restore any of them back into the live pipeline at any time.</li>
         </ul>
@@ -1181,23 +1367,165 @@ function renderModDocs(m){
 }
 
 /* ============================================================
-   DAILY OUTREACH (global) — counters, follow-ups across all
-   departments, and quick links into each message library
+   GLOBAL CALENDAR — appointments + follow-ups across every
+   department and client, with WA-labels shown per entry
    ============================================================ */
+function renderCalendarTab(){
+  return `
+    <div class="doc-note">Every client follow-up date and every department record's follow-up date shows here automatically, plus any appointment you add manually. This is the same calendar concept as each department's own Calendar tab, rolled up to the whole company.</div>
+    <div class="card" style="margin-bottom:16px">
+      <div class="section-title" style="margin-top:0">+ Add appointment / follow-up</div>
+      <div class="form-row2">
+        <div><label>Title</label><input id="gevt_title" placeholder="e.g. Contract renewal review"></div>
+        <div><label>Client</label><select id="gevt_client">${state.clients.map(c=>`<option value="${c.id}">${c.name}</option>`).join('')}</select></div>
+      </div>
+      <div class="form-row2">
+        <div><label>Department (optional)</label><select id="gevt_module"><option value="">— none / general —</option>${MODULES.map(m=>`<option value="${m.id}">${m.icon} ${m.title}</option>`).join('')}</select></div>
+        <div><label>Date</label><input id="gevt_date" type="date" value="${todayStr()}"></div>
+      </div>
+      <div class="form-row2">
+        <div><label>Time</label><input id="gevt_time" type="time" value="09:00"></div>
+        <div><label>Notes</label><input id="gevt_notes" placeholder="optional"></div>
+      </div>
+      <button class="btn btn-primary btn-sm" style="margin-top:10px" onclick="addGlobalCalendarEvent()">+ Add to calendar</button>
+    </div>
+    <div class="cal-wrap">
+      <div class="cal-header">
+        <div class="cal-nav">
+          <button class="cal-nav-btn" onclick="calNavGlobal(-1)">‹</button>
+          <div class="cal-month-label" id="globalCalLabel">—</div>
+          <button class="cal-nav-btn" onclick="calNavGlobal(1)">›</button>
+        </div>
+        <button class="cal-today-btn" onclick="calGoTodayGlobal()">TODAY</button>
+      </div>
+      <div class="cal-grid" id="globalCalGrid"></div>
+      <div class="cal-legend">
+        <span>🔵 Hot</span><span>🟢 Active conversation</span><span>🟠 Read no reply</span><span>🟡 Unread</span><span>🔄 Re-engage</span><span>🔴 Call only</span><span>✅ Client</span><span>📌 Department follow-up</span><span>🗓 Manual appointment</span>
+      </div>
+    </div>
+    <div class="section-title">Upcoming this week</div>
+    <div id="calUpcomingList"></div>
+  `;
+}
+let globalCalMonth=new Date().getMonth(), globalCalYear=new Date().getFullYear();
+function calNavGlobal(dir){globalCalMonth+=dir;if(globalCalMonth<0){globalCalMonth=11;globalCalYear--;}if(globalCalMonth>11){globalCalMonth=0;globalCalYear++;}renderGlobalCalendarGrid();}
+function calGoTodayGlobal(){const d=new Date();globalCalMonth=d.getMonth();globalCalYear=d.getFullYear();renderGlobalCalendarGrid();}
+function renderGlobalCalendarGrid(){
+  const gridEl=document.getElementById('globalCalGrid');
+  if(!gridEl)return;
+  gridEl.innerHTML=buildCalendarHtml(globalCalYear,globalCalMonth,(dateKey)=>{
+    const clientItems=state.clients.filter(c=>c.nextFollowUp===dateKey).map(c=>({label:signalFor(c.waLabel).icon+' '+c.name,onclick:`openClient('${c.id}')`}));
+    const recItems=state.records.filter(r=>r.nextFollowUp===dateKey&&r.stage!=='Resolved'&&r.stage!=='Rejected').map(r=>({label:'📌 '+r.clientName+' — '+m_label(r.module),onclick:`openRecordModal('${r.id}')`}));
+    const evtItems=state.calendarEvents.filter(e=>e.date===dateKey).map(e=>({label:'🗓 '+e.title+' — '+e.clientName,onclick:`showCalendarEventInfo('${e.id}')`}));
+    return clientItems.concat(recItems).concat(evtItems);
+  },'globalcal');
+  renderCalUpcomingList();
+}
+function renderCalUpcomingList(){
+  const el=document.getElementById('calUpcomingList');
+  if(!el)return;
+  const today=new Date();today.setHours(0,0,0,0);
+  const weekOut=new Date(today.getTime()+7*86400000);
+  const items=[];
+  state.clients.forEach(c=>{ if(c.nextFollowUp){const d=new Date(c.nextFollowUp);if(d>=today&&d<=weekOut)items.push({date:c.nextFollowUp,label:c.name+' — client follow-up',sig:signalFor(c.waLabel)});} });
+  state.calendarEvents.forEach(e=>{ const d=new Date(e.date); if(d>=today&&d<=weekOut)items.push({date:e.date,label:e.title+' — '+e.clientName+(e.time?' at '+e.time:''),sig:null}); });
+  items.sort((a,b)=>a.date.localeCompare(b.date));
+  el.innerHTML=items.length?items.map(it=>`<div class="activity-item"><div class="dot" style="background:${it.sig?it.sig.color:'var(--teal)'}"></div><div style="flex:1">${it.label}</div><span style="font-size:10px;color:var(--muted)">${fmtDate(it.date)}</span></div>`).join(''):'<div style="color:var(--muted);font-size:12px">Nothing scheduled in the next 7 days.</div>';
+}
+async function addGlobalCalendarEvent(){
+  const title=document.getElementById('gevt_title').value.trim();
+  const clientId=document.getElementById('gevt_client').value;
+  const moduleId=document.getElementById('gevt_module').value;
+  const date=document.getElementById('gevt_date').value||todayStr();
+  const time=document.getElementById('gevt_time').value||'09:00';
+  const notes=document.getElementById('gevt_notes').value.trim();
+  if(!title){showToast('Add a title first');return;}
+  const client=state.clients.find(c=>c.id===clientId);
+  const evt={id:uid('EVT'),clientId,clientName:client?client.name:'—',title,date,time,module:moduleId||null,notes,created:Date.now()};
+  state.calendarEvents.unshift(evt);
+  await saveCalendarEvents();
+  addActivity(clientId,evt.clientName,'Calendar appointment added: '+title+' on '+fmtDate(date));
+  showToast('Appointment added to calendar');
+  document.getElementById('gevt_title').value='';document.getElementById('gevt_notes').value='';
+  renderGlobalCalendarGrid();
+}
+
+/* shared month-grid builder used by global + per-department calendars */
+function buildCalendarHtml(year,month,getItemsForDate,idPrefix,moduleIdForNav){
+  const MONTHS=['January','February','March','April','May','June','July','August','September','October','November','December'];
+  const labelEl = idPrefix==='globalcal' ? document.getElementById('globalCalLabel') : null;
+  if(labelEl)labelEl.textContent=MONTHS[month]+' '+year;
+  const today=new Date();today.setHours(0,0,0,0);
+  const todayKey=todayStr();
+  const firstOfMonth=new Date(year,month,1);
+  const startDow=firstOfMonth.getDay();
+  const daysInMonth=new Date(year,month+1,0).getDate();
+  const dowLabels=['SUN','MON','TUE','WED','THU','FRI','SAT'];
+  let html=dowLabels.map(d=>`<div class="cal-dow">${d}</div>`).join('');
+  for(let i=0;i<startDow;i++)html+='<div class="cal-cell empty"></div>';
+  for(let day=1;day<=daysInMonth;day++){
+    const cellDate=new Date(year,month,day);
+    const key=cellDate.toISOString().slice(0,10);
+    const items=getItemsForDate(key)||[];
+    const isTod=key===todayKey;
+    const isOverdue=cellDate<today&&items.length>0;
+    const shown=items.slice(0,3);
+    const more=items.length-shown.length;
+    html+=`<div class="cal-cell ${isTod?'today':''} ${isOverdue?'has-overdue':''}">
+      <div class="cal-daynum">${day}</div>
+      ${shown.map(it=>`<div class="cal-pill" onclick="${it.onclick}">${it.label}</div>`).join('')}
+      ${more>0?`<div class="cal-more">+${more} more</div>`:''}
+    </div>`;
+  }
+  // stash a tiny nav header replacement isn't needed here since header already in tab template for module calendars — add one for module calendars if missing
+  if(idPrefix!=='globalcal'){
+    html=`<div class="cal-header"><div class="cal-nav"><button class="cal-nav-btn" onclick="calNavModModule('${moduleIdForNav}',-1)">‹</button><div class="cal-month-label">${MONTHS[month]} ${year}</div><button class="cal-nav-btn" onclick="calNavModModule('${moduleIdForNav}',1)">›</button></div><button class="cal-today-btn" onclick="calGoTodayMod('${moduleIdForNav}')">TODAY</button></div><div class="cal-grid">${html}</div>`;
+  }
+  return html;
+}
+
+/* ============================================================
+   DAILY OUTREACH (global) — counters by TYPE (Call, WhatsApp,
+   Comment, DM, Email), WhatsApp Status Views, follow-ups
+   across all departments
+   ============================================================ */
+const OUTREACH_TYPES=['WhatsApp','Call','Email','DM','Comment'];
 function renderOutreachTab(){
   const today=state.dailyOutreach.filter(o=>isToday(o.ts));
   const allDue=state.records.filter(r=>r.stage!=='Resolved'&&r.stage!=='Rejected'&&r.nextFollowUp<=todayStr());
   const byModuleDue={};
   allDue.forEach(r=>{byModuleDue[r.module]=(byModuleDue[r.module]||0)+1;});
+  const byType={};
+  OUTREACH_TYPES.forEach(t=>byType[t]=state.dailyOutreach.filter(o=>(o.type||'WhatsApp')===t).length);
+  const byTypeToday={};
+  OUTREACH_TYPES.forEach(t=>byTypeToday[t]=today.filter(o=>(o.type||'WhatsApp')===t).length);
   return `
     <div class="kpi-grid">
-      <div class="kpi" style="--accent:var(--gold)"><div class="label">MESSAGES TODAY</div><div class="value">${today.length}</div><div class="sub">${state.dailyOutreach.length} all-time</div></div>
+      <div class="kpi" style="--accent:var(--gold)"><div class="label">MESSAGES/CONTACTS TODAY</div><div class="value">${today.length}</div><div class="sub">${state.dailyOutreach.length} all-time</div></div>
       <div class="kpi" style="--accent:var(--orange)"><div class="label">FOLLOW-UPS DUE — ALL DEPTS</div><div class="value">${allDue.length}</div><div class="sub">across all 7 departments</div></div>
+      <div class="kpi" style="--accent:var(--blue)"><div class="label">WHATSAPP STATUS VIEWS</div><div class="value">${state.waStatusViews.length}</div><div class="sub">${state.waStatusViews.filter(v=>isToday(v.ts)).length} today</div></div>
     </div>
-    <div class="card">
-      <label>Log a message sent manually (cold outreach, WhatsApp, SMS, etc.)</label>
-      <input id="out_note" placeholder="e.g. Sent cold outreach to Spice & Sizzle Food">
-      <button class="btn btn-primary btn-sm" style="margin-top:10px" onclick="logManualOutreach()">+ Log message sent</button>
+    <div class="kpi-grid">
+      ${OUTREACH_TYPES.map(t=>`<div class="kpi" style="--accent:var(--teal)"><div class="label">${t.toUpperCase()}</div><div class="value" style="font-size:20px">${byTypeToday[t]}</div><div class="sub">${byType[t]} all-time</div></div>`).join('')}
+    </div>
+    <div class="grid-2">
+      <div class="card">
+        <div class="section-title" style="margin-top:0">Log outreach sent</div>
+        <label>Contact type</label>
+        <select id="out_type">${OUTREACH_TYPES.map(t=>`<option>${t}</option>`).join('')}</select>
+        <label>Client (optional)</label>
+        <select id="out_client"><option value="">— general / not tied to a client —</option>${state.clients.map(c=>`<option value="${c.id}">${c.name}</option>`).join('')}</select>
+        <label>Note</label>
+        <input id="out_note" placeholder="e.g. Sent cold outreach to Spice & Sizzle Food">
+        <button class="btn btn-primary btn-sm" style="margin-top:10px" onclick="logManualOutreach()">+ Log contact sent</button>
+      </div>
+      <div class="card">
+        <div class="section-title" style="margin-top:0">Log WhatsApp status view</div>
+        <p style="font-size:11px;color:var(--muted);margin-bottom:8px">Track clients who view your WhatsApp Business status — a warm signal worth following up on.</p>
+        <label>Client</label>
+        <select id="wsv_client">${state.clients.map(c=>`<option value="${c.id}">${c.name}</option>`).join('')}</select>
+        <button class="btn btn-blue btn-sm" style="margin-top:10px" onclick="logWaStatusView()">👁 Log status view</button>
+      </div>
     </div>
     <div class="section-title">Follow-ups due today, by department</div>
     <div class="module-grid">
@@ -1208,17 +1536,44 @@ function renderOutreachTab(){
         <div style="font-size:9px;color:var(--muted)">due today — open Follow-Ups</div>
       </div>`).join('')}
     </div>
-    <div class="section-title">Recent outreach log</div>
-    ${state.dailyOutreach.slice(0,15).map(o=>`<div class="activity-item"><div class="dot" style="background:var(--gold)"></div><div>${o.note} <span style="color:var(--muted);font-size:10px">· ${fmtDate(o.ts)}</span></div></div>`).join('')||'<div style="color:var(--muted);font-size:12px">Nothing logged yet.</div>'}
+    <div class="grid-2">
+      <div class="card">
+        <div class="section-title" style="margin-top:0">Recent outreach log</div>
+        ${state.dailyOutreach.slice(0,15).map(o=>`<div class="activity-item"><div class="dot" style="background:var(--gold)"></div><div style="flex:1"><span class="pill" style="background:#1c1a16;color:var(--teal);margin-right:6px">${o.type||'WhatsApp'}</span>${o.note} <span style="color:var(--muted);font-size:10px">· ${fmtDate(o.ts)}</span></div></div>`).join('')||'<div style="color:var(--muted);font-size:12px">Nothing logged yet.</div>'}
+      </div>
+      <div class="card">
+        <div class="section-title" style="margin-top:0">Recent WhatsApp status views</div>
+        ${state.waStatusViews.slice(0,15).map(v=>`<div class="activity-item"><div class="dot" style="background:var(--blue)"></div><div style="flex:1;cursor:pointer" onclick="openClient('${v.clientId}')">${v.clientName} <span style="color:var(--muted);font-size:10px">· ${fmtDate(v.ts)}</span></div></div>`).join('')||'<div style="color:var(--muted);font-size:12px">No status views logged yet.</div>'}
+      </div>
+    </div>
   `;
 }
 async function logManualOutreach(){
   const note=document.getElementById('out_note').value.trim();
+  const type=document.getElementById('out_type').value||'WhatsApp';
+  const clientId=document.getElementById('out_client').value;
   if(!note){ showToast('Add a short note first'); return; }
-  state.dailyOutreach.unshift({id:uid('OUT'),note,ts:Date.now()});
+  const client=state.clients.find(c=>c.id===clientId);
+  state.dailyOutreach.unshift({id:uid('OUT'),type,note,ts:Date.now(),clientId:clientId||null});
   await saveOutreach();
+  if(client){
+    client.messageCount=(client.messageCount||0)+1;
+    client.lastContact=todayStr();
+    await saveClients();
+    addActivity(client.id,client.name,type+' logged: '+note);
+  }
   document.getElementById('out_note').value='';
   showToast('Logged');
+  renderDashboard();
+}
+async function logWaStatusView(){
+  const clientId=document.getElementById('wsv_client').value;
+  const client=state.clients.find(c=>c.id===clientId);
+  if(!client){showToast('Select a client first');return;}
+  state.waStatusViews.unshift({id:uid('WSV'),clientId,clientName:client.name,ts:Date.now(),note:'Viewed WhatsApp status'});
+  await saveWaStatusViews();
+  addActivity(clientId,client.name,'Viewed your WhatsApp status — warm signal');
+  showToast('Status view logged — '+client.name);
   renderDashboard();
 }
 
@@ -1283,6 +1638,223 @@ function renderRevenueTab(){
   `;
 }
 
+/* ============================================================
+   SUMMARY / ANALYTICS — extended period filters:
+   Today, Week, Month, Q1-Q4, 6 Months, 1/2/3/4/5 Years, All Time
+   ============================================================ */
+let analyticsPeriod='month';
+const ANALYTICS_PERIODS=[
+  {id:'today',label:'TODAY'},{id:'week',label:'THIS WEEK'},{id:'month',label:'THIS MONTH'},
+  {id:'q1',label:'Q1'},{id:'q2',label:'Q2'},{id:'q3',label:'Q3'},{id:'q4',label:'Q4'},
+  {id:'6m',label:'6 MONTHS'},{id:'1y',label:'1 YEAR'},{id:'2y',label:'2 YEARS'},
+  {id:'3y',label:'3 YEARS'},{id:'4y',label:'4 YEARS'},{id:'5y',label:'5 YEARS'},{id:'all',label:'ALL TIME'}
+];
+function setAnalyticsPeriod(p){analyticsPeriod=p;renderDashboard();}
+function getAnalyticsRange(period){
+  const now=new Date();const y=now.getFullYear();
+  let start=new Date(now), end=new Date(now);
+  if(period==='today'){start.setHours(0,0,0,0);}
+  else if(period==='week'){const day=now.getDay();start.setDate(now.getDate()-day);start.setHours(0,0,0,0);}
+  else if(period==='month'){start=new Date(y,now.getMonth(),1);}
+  else if(period==='q1'){start=new Date(y,0,1);end=new Date(y,2,31,23,59,59);}
+  else if(period==='q2'){start=new Date(y,3,1);end=new Date(y,5,30,23,59,59);}
+  else if(period==='q3'){start=new Date(y,6,1);end=new Date(y,8,30,23,59,59);}
+  else if(period==='q4'){start=new Date(y,9,1);end=new Date(y,11,31,23,59,59);}
+  else if(period==='6m'){start=new Date(now);start.setMonth(start.getMonth()-6);}
+  else if(period==='1y'){start=new Date(now);start.setFullYear(start.getFullYear()-1);}
+  else if(period==='2y'){start=new Date(now);start.setFullYear(start.getFullYear()-2);}
+  else if(period==='3y'){start=new Date(now);start.setFullYear(start.getFullYear()-3);}
+  else if(period==='4y'){start=new Date(now);start.setFullYear(start.getFullYear()-4);}
+  else if(period==='5y'){start=new Date(now);start.setFullYear(start.getFullYear()-5);}
+  else if(period==='all'){
+    const dates=state.clients.map(c=>new Date(c.created)).filter(d=>!isNaN(d.getTime()));
+    start = dates.length ? new Date(Math.min(...dates.map(d=>d.getTime()))) : new Date(now.getFullYear()-1,0,1);
+  }
+  end.setHours(23,59,59,999);
+  return {start,end};
+}
+function computeAnalyticsForRange(range){
+  const clientsInRange=state.clients.filter(c=>{const d=new Date(c.created);return d>=range.start&&d<=range.end;});
+  const active=state.clients.filter(c=>c.stage==='Active'||c.stage==='Renewal Due');
+  // revenue recognized within range = sum of monthly*months-active-in-range (simplified: prorate by days) + one-time build value for clients created in range
+  const msPerDay=86400000;
+  let mrrRevenue=0;
+  active.forEach(c=>{
+    const created=new Date(c.created);
+    const overlapStart=created>range.start?created:range.start;
+    const overlapEnd=range.end<new Date()?range.end:new Date();
+    if(overlapEnd>overlapStart){
+      const days=Math.max(0,(overlapEnd-overlapStart)/msPerDay);
+      mrrRevenue += (c.monthly/30)*days;
+    }
+  });
+  const buildRevenue=clientsInRange.filter(c=>c.stage!=='Prospect').reduce((s,c)=>s+c.contractValue,0);
+  const outreach=state.dailyOutreach.filter(o=>{const d=new Date(o.ts);return d>=range.start&&d<=range.end;});
+  const waViews=state.waStatusViews.filter(v=>{const d=new Date(v.ts);return d>=range.start&&d<=range.end;});
+  const calls=state.calls.filter(c=>{const d=new Date(c.ts);return d>=range.start&&d<=range.end;});
+  const wonInRange=clientsInRange.filter(c=>c.stage==='Active');
+  return {clientsInRange,mrrRevenue:Math.round(mrrRevenue),buildRevenue,outreach,waViews,calls,wonInRange};
+}
+function renderAnalyticsTab(){
+  const range=getAnalyticsRange(analyticsPeriod);
+  const A=computeAnalyticsForRange(range);
+  const totalRevenue=A.mrrRevenue+A.buildRevenue;
+  const totalContacts=state.clients.length;
+  const conversionRate=totalContacts>0?((state.clients.filter(c=>c.stage==='Active').length/totalContacts)*100):0;
+  const byType={};OUTREACH_TYPES.forEach(t=>byType[t]=A.outreach.filter(o=>(o.type||'WhatsApp')===t).length);
+
+  // messages-before-conversation across whole portfolio (not just range) — informative regardless of period
+  const withConvo=state.clients.filter(c=>c.firstConversationAt);
+  const avgMsgsBeforeConvo = withConvo.length ? Math.round((withConvo.reduce((s,c)=>s+(c.firstConversationAt||0),0)/withConvo.length)*10)/10 : null;
+  const coldNoConvo=state.clients.filter(c=>(c.messageCount||0)>0 && !c.firstConversationAt);
+
+  const byModule={};MODULES.forEach(m=>byModule[m.id]=state.records.filter(r=>r.module===m.id&&new Date(r.ts)>=range.start&&new Date(r.ts)<=range.end).length);
+
+  return `
+    <div class="filter-row" id="analyticsPeriodFilters">
+      ${ANALYTICS_PERIODS.map(p=>`<button class="filter-btn ${analyticsPeriod===p.id?'active':''}" onclick="setAnalyticsPeriod('${p.id}')">${p.label}</button>`).join('')}
+    </div>
+    <div class="doc-note">${range.start.toLocaleDateString('en-GB')} — ${(range.end<new Date()?range.end:new Date()).toLocaleDateString('en-GB')}</div>
+    <div class="kpi-grid">
+      <div class="kpi" style="--accent:var(--gold)"><div class="label">REVENUE — PERIOD</div><div class="value">${fmtMoney(totalRevenue)}</div><div class="sub">MRR: ${fmtMoney(A.mrrRevenue)} · Build: ${fmtMoney(A.buildRevenue)}</div></div>
+      <div class="kpi" style="--accent:var(--green)"><div class="label">NEW CLIENTS WON</div><div class="value">${A.wonInRange.length}</div><div class="sub">${A.clientsInRange.length} total added this period</div></div>
+      <div class="kpi" style="--accent:var(--blue)"><div class="label">OUTREACH SENT</div><div class="value">${A.outreach.length}</div><div class="sub">calls logged: ${A.calls.length}</div></div>
+      <div class="kpi" style="--accent:var(--teal)"><div class="label">WHATSAPP STATUS VIEWS</div><div class="value">${A.waViews.length}</div><div class="sub">this period</div></div>
+      <div class="kpi" style="--accent:var(--purple)"><div class="label">AVG MSGS → FIRST REPLY</div><div class="value">${avgMsgsBeforeConvo!==null?avgMsgsBeforeConvo:'—'}</div><div class="sub">across contacts that replied</div></div>
+      <div class="kpi" style="--accent:var(--red)"><div class="label">COLD — NO CONVERSATION YET</div><div class="value">${coldNoConvo.length}</div><div class="sub">messaged, still no reply</div></div>
+      <div class="kpi" style="--accent:var(--orange)"><div class="label">OVERALL CONVERSION RATE</div><div class="value">${conversionRate.toFixed(1)}%</div><div class="sub">of ${totalContacts} total contacts</div></div>
+    </div>
+    <div class="grid-2">
+      <div class="card">
+        <div class="section-title" style="margin-top:0">Outreach by type — this period</div>
+        <div class="bar-wrap">${OUTREACH_TYPES.map(t=>{const v=byType[t];const max=Math.max(1,...OUTREACH_TYPES.map(tt=>byType[tt]));return `<div class="bar-group"><div class="mono" style="font-size:9px;color:var(--gold)">${v}</div><div class="bar" style="height:${Math.max(6,Math.round((v/max)*110))}px"></div><div class="bar-vlabel">${t}</div></div>`;}).join('')}</div>
+      </div>
+      <div class="card">
+        <div class="section-title" style="margin-top:0">New department records this period</div>
+        ${MODULES.map(m=>`<div class="activity-item"><span>${m.icon} ${m.title}</span><span style="margin-left:auto;font-weight:700">${byModule[m.id]||0}</span></div>`).join('')}
+      </div>
+    </div>
+    <div class="section-title">Cold leads — messaged but never had a conversation</div>
+    <div class="card"><div class="scroll-table"><table>
+      <thead><tr><th>Client</th><th>Stage</th><th>Messages sent</th><th>Last contact</th></tr></thead>
+      <tbody>${coldNoConvo.map(c=>`<tr class="rowlink" onclick="openClient('${c.id}')"><td>${c.name}</td><td>${c.stage}</td><td class="mono" style="color:var(--red)">${c.messageCount||0}</td><td>${fmtDate(c.lastContact)}</td></tr>`).join('')||'<tr><td colspan="4" style="text-align:center;padding:16px;color:var(--muted)">None right now</td></tr>'}</tbody>
+    </table></div></div>
+    <div class="section-title">Period breakdown — quick compare</div>
+    <div class="pricing-grid">
+      ${ANALYTICS_PERIODS.map(p=>{const r=getAnalyticsRange(p.id);const d=computeAnalyticsForRange(r);return `<div class="card price-card"><div class="tag">${p.label}</div><div class="amt">${fmtMoney(d.mrrRevenue+d.buildRevenue)}</div><div class="amt2">${d.wonInRange.length} won · ${d.outreach.length} outreach</div></div>`;}).join('')}
+    </div>
+  `;
+}
+
+/* ============================================================
+   AI ASSISTANT — upload playbook/company docs, read pipeline +
+   conversation history, and get suggested next messages.
+   Uses the in-artifact Anthropic API proxy (see docs at top of
+   file for how this works inside Claude.ai artifacts).
+   ============================================================ */
+let aiChatHistory=[];
+function renderAITab(){
+  return `
+    <div class="card" style="margin-bottom:16px;border-color:var(--gold-dim)">
+      <div class="section-title" style="margin-top:0">📚 Company playbook / documents</div>
+      <p style="font-size:12px;color:var(--text-dim);margin-bottom:10px">Paste your SOPs, sales playbook, objection-handling guide, or any company document here. The AI assistant below reads this alongside live pipeline data and conversation history before answering, so its suggestions reflect how your company actually operates.</p>
+      <textarea id="playbookText" rows="8" placeholder="Paste your playbook, SOPs, tone-of-voice guide, pricing rules, objection handling, etc. here...">${escapeHtml(state.playbook||'')}</textarea>
+      <button class="btn btn-primary btn-sm" style="margin-top:10px" onclick="savePlaybookText()">💾 Save playbook</button>
+      <span style="font-size:11px;color:var(--muted);margin-left:10px">${state.playbook?state.playbook.length+' characters saved':'No playbook saved yet'}</span>
+    </div>
+    <div class="card" style="border-color:var(--teal)">
+      <div class="section-title" style="margin-top:0">🤖 Ask the AI assistant</div>
+      <p style="font-size:12px;color:var(--text-dim);margin-bottom:10px">Ask things like "who should I contact first today?", "what should I say to Client X?", or "why isn't this cold lead converting?" — it reads live pipeline data, activity history, and your saved playbook before answering.</p>
+      <div class="ai-chat-window" id="aiChatWindow"></div>
+      <div style="display:flex;gap:8px">
+        <input id="aiChatInput" placeholder="Ask about a client, a department, or what to say next..." onkeydown="if(event.key==='Enter')sendAIChat()">
+        <button class="btn btn-teal btn-sm" style="white-space:nowrap" onclick="sendAIChat()">ASK AI</button>
+      </div>
+      <div id="aiQuickPrompts" style="margin-top:10px;display:flex;gap:6px;flex-wrap:wrap"></div>
+    </div>
+  `;
+}
+const AI_QUICK_PROMPTS=['Who should I contact first today?','Which cold leads need a different approach?','Summarise this week\'s pipeline health','Draft a renewal reminder for overdue accounts'];
+function renderAIQuickPrompts(){
+  const el=document.getElementById('aiQuickPrompts');
+  if(!el)return;
+  el.innerHTML='';
+  AI_QUICK_PROMPTS.forEach(q=>{
+    const btn=document.createElement('button');
+    btn.className='filter-btn';
+    btn.textContent=q;
+    btn.onclick=function(){ document.getElementById('aiChatInput').value=q; sendAIChat(); };
+    el.appendChild(btn);
+  });
+}
+async function savePlaybookText(){
+  state.playbook=document.getElementById('playbookText').value;
+  await savePlaybook();
+  showToast('Playbook saved — '+state.playbook.length+' characters');
+  renderDashboard();
+}
+function addAIChatBubble(role,text){
+  const win=document.getElementById('aiChatWindow');
+  if(!win)return;
+  const div=document.createElement('div');
+  div.className='ai-bubble '+role;
+  div.textContent=text;
+  win.appendChild(div);
+  win.scrollTop=win.scrollHeight;
+}
+function buildPipelineContextForAI(){
+  const active=state.clients.filter(c=>c.stage==='Active'||c.stage==='Renewal Due');
+  const mrr=active.reduce((s,c)=>s+c.monthly,0);
+  const dueToday=state.clients.filter(c=>c.nextFollowUp&&c.nextFollowUp<=todayStr());
+  const coldNoConvo=state.clients.filter(c=>(c.messageCount||0)>0&&!c.firstConversationAt);
+  const clientLines=state.clients.slice(0,60).map(c=>
+    `${c.name} | stage:${c.stage} | wa:${signalFor(c.waLabel).name} | msgs:${c.messageCount||0} | lastContact:${c.lastContact||'—'} | nextFollowUp:${c.nextFollowUp||'—'} | notes:${(c.notes||'').substring(0,100)}`
+  ).join('\n');
+  const recentActivity=state.activity.slice(0,25).map(a=>`${fmtDate(a.ts)} — ${a.clientName}: ${a.text}`).join('\n');
+  return `LIVE PORTFOLIO SNAPSHOT:\nMRR: GHS ${mrr} across ${active.length} active clients\nFollow-ups due today: ${dueToday.length}\nCold leads with no reply yet: ${coldNoConvo.length}\n\nCLIENT LIST (name | stage | wa label | messages sent | last contact | next follow-up | notes):\n${clientLines}\n\nRECENT ACTIVITY LOG:\n${recentActivity}`;
+}
+async function sendAIChat(){
+  const input=document.getElementById('aiChatInput');
+  const question=input.value.trim();
+  if(!question)return;
+  input.value='';
+  addAIChatBubble('user',question);
+  const loadingDiv=document.createElement('div');
+  loadingDiv.className='ai-bubble assistant';
+  loadingDiv.textContent='Thinking...';
+  loadingDiv.id='aiLoadingBubble';
+  document.getElementById('aiChatWindow').appendChild(loadingDiv);
+  const systemPrompt=`You are the AI operations assistant inside the BYINFORGH Enterprise Command System for a corporate client. You have access to the company's saved playbook/SOPs and live pipeline data below. Use them together to give specific, actionable answers — reference real client names, stages, and dates from the data given. If asked what to say to a client, write the exact message. Be concise and direct.\n\nCOMPANY PLAYBOOK / SOPs:\n${(state.playbook||'No playbook uploaded yet.').substring(0,4000)}\n\n${buildPipelineContextForAI()}`;
+  aiChatHistory.push({role:'user',content:question});
+  try{
+    const response=await fetch("https://api.anthropic.com/v1/messages", {
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({
+        model:"claude-sonnet-4-6",
+        max_tokens:1000,
+        system:systemPrompt,
+        messages: aiChatHistory.slice(-8)
+      })
+    });
+    const data=await response.json();
+    const textBlocks=(data.content||[]).filter(b=>b.type==='text').map(b=>b.text).join('\n');
+    const reply=textBlocks||'(no response — try rephrasing)';
+    document.getElementById('aiLoadingBubble')?.remove();
+    addAIChatBubble('assistant',reply);
+    aiChatHistory.push({role:'assistant',content:reply});
+  }catch(e){
+    document.getElementById('aiLoadingBubble')?.remove();
+    addAIChatBubble('assistant','Could not reach the AI backend right now. Meanwhile — '+quickLocalPipelineSummary());
+  }
+}
+function quickLocalPipelineSummary(){
+  const active=state.clients.filter(c=>c.stage==='Active'||c.stage==='Renewal Due');
+  const mrr=active.reduce((s,c)=>s+c.monthly,0);
+  const dueToday=state.clients.filter(c=>c.nextFollowUp&&c.nextFollowUp<=todayStr());
+  return `MRR: ${fmtMoney(mrr)} · ${active.length} active clients · ${dueToday.length} follow-ups due today.`;
+}
+
 /* ---------- ACTIVITY LOG TAB ---------- */
 function renderActivityTab(){
   return `<div class="card">${state.activity.map(a=>`<div class="timeline-item"><a onclick="openClient('${a.clientId}')" style="cursor:pointer;color:var(--gold)">${a.clientName}</a> — ${a.text} <span style="color:var(--muted);font-size:10px">· ${fmtDate(a.ts)}</span></div>`).join('')||'<div style="color:var(--muted)">No activity yet.</div>'}</div>`;
@@ -1318,7 +1890,9 @@ async function submitInternalAdd(){
     tierKey:tier.key,stage:document.getElementById('ac_stage').value,contractValue:tier.build,monthly:tier.monthly,
     health:80,renewal:new Date(Date.now()+365*86400000).toISOString(),created:new Date().toISOString(),
     modules:[],notes:document.getElementById('ac_notes').value.trim(),
-    contactName:document.getElementById('ac_contact').value.trim(),contactNumber:document.getElementById('ac_number').value.trim()
+    contactName:document.getElementById('ac_contact').value.trim(),contactNumber:document.getElementById('ac_number').value.trim(),
+    waLabel:'unread',lastContact:todayStr(),nextFollowUp:new Date(Date.now()+2*86400000).toISOString().slice(0,10),
+    messageCount:0,firstConversationAt:null
   };
   state.clients.unshift(c);
   await saveClients();
@@ -1339,7 +1913,7 @@ function renderSettingsTab(){
   </div>
   <div class="card" style="margin-top:16px;border-color:var(--red)">
     <div class="section-title" style="margin-top:0;color:var(--red)">Reset demo data</div>
-    <div style="font-size:12px;color:var(--text-dim);margin-bottom:10px">Wipes clients, records, calls, activity, and outreach log, then reseeds a fresh 50-client demo portfolio. Use before a live pitch to start clean.</div>
+    <div style="font-size:12px;color:var(--text-dim);margin-bottom:10px">Wipes clients, records, calls, activity, calendar events, outreach, and status views, then reseeds a fresh 50-client demo portfolio. Use before a live pitch to start clean.</div>
     <button class="btn btn-red btn-sm" onclick="resetAllData()">🗑 Reset all demo data</button>
   </div>`;
 }
@@ -1351,6 +1925,8 @@ async function resetAllData(){
   state.records=seedRecords(state.clients); await saveRecords();
   state.calls=seedCalls(state.records); await saveCalls();
   state.dailyOutreach=seedDailyOutreach(); await saveOutreach();
+  state.waStatusViews=seedWaStatusViews(state.clients); await saveWaStatusViews();
+  state.calendarEvents=seedCalendarEvents(state.clients); await saveCalendarEvents();
   showToast('Demo data reset');
   renderDashboard();
 }
@@ -1358,42 +1934,37 @@ async function resetAllData(){
 /* ---------- DOCUMENTATION ---------- */
 function renderDocsTab(){
   const docs=[
-    {t:'Overview',b:'The executive summary of the whole portfolio: total MRR, cumulative contract value, prospects in pipeline, upcoming renewals, messages sent today, follow-ups due across all departments today, and calls logged today. Start every session here.'},
+    {t:'Overview',b:'The executive summary of the whole portfolio: total MRR, cumulative contract value, prospects in pipeline, upcoming renewals, messages sent today, follow-ups due across all departments today, calls logged today, calendar events today, and cold leads with no reply yet. Start every session here.'},
     {t:'Pipeline',b:'A kanban view of every client by stage — Prospect → Onboarding → Active → Renewal Due → Paused → Churned. Click any card to open the full client record. New applications from the public Apply form land here automatically as Prospect.'},
-    {t:'Clients',b:'The full searchable client register. Filter by stage and by region, search by name/industry, and click any row to open the client detail record — where you can change stage, toggle which of the seven departments are active for that client, log a note, and see their full activity timeline.'},
-    {t:'Departments',b:'The seven operational pillars, each with its own full workspace: Overview (counts, region and signal breakdowns), Pipeline (kanban by record stage), Follow-Ups (due-today queue with ready-to-send messages and one-tap actions), Calls (call log tied to records), Messages (editable per-department wording library for cold outreach, follow-ups, and objection handling), Archive (rejected items, restorable), and Docs (how to run that department day-to-day).'},
-    {t:'Daily Outreach',b:'The company-wide counter for messages sent today and all-time, a manual log button for outreach done outside a specific record, and a per-department breakdown of how many follow-ups are due right now.'},
+    {t:'Clients',b:'The full searchable client register: stage, editable WhatsApp label, tier, MRR, date joined, last contact, next follow-up, total messages sent (flagged if never replied), and health score. Filter by stage and region, search freely, and click any row to open the full editable client record.'},
+    {t:'Departments',b:'The seven operational pillars, each with its own full workspace: Overview, Pipeline (kanban by record stage), Calendar (monthly grid of that department\'s follow-ups and appointments), Daily Tasks (everything due today in one checklist), Follow-Ups (due-today queue with ready-to-send messages and one-tap actions), Calls (call log tied to records — automatically counted in Daily Outreach), Messages (editable per-department wording library), Archive (rejected items, restorable), and Docs.'},
+    {t:'Calendar',b:'A company-wide monthly calendar rolling up every client follow-up date, every department record\'s follow-up date, and any appointment you add manually — click a day to see everything due, click an entry to jump straight to that client or record.'},
+    {t:'Daily Outreach',b:'Log outreach by type — WhatsApp, Call, Email, DM, or Comment — with counters for today and all-time, broken down by type. Also tracks WhatsApp Status Views (a client viewing your WhatsApp Business status) as a separate warm-signal log, plus a per-department breakdown of follow-ups due right now.'},
     {t:'Revenue',b:'MRR, annualised run rate, and cumulative build value, broken down by tier and by region, with active-client counts. The renewals table repeats the 45-day renewal window with direct links into each client record.'},
-    {t:'Activity Log',b:'A single reverse-chronological feed of every system event — applications, stage changes, record additions, calls, message sends, ticket resolutions — across the entire portfolio and every department. Click any client name to jump to their record.'},
+    {t:'Summary',b:'The full analytics view with period filters: Today, This Week, This Month, Q1–Q4, 6 Months, 1/2/3/4/5 Years, and All Time. Shows revenue recognised in that window, new clients won, outreach sent by type, WhatsApp status views, average messages before a cold lead\'s first reply, and a live list of cold leads that have been messaged but never had a conversation.'},
+    {t:'AI Assistant',b:'Upload your company playbook, SOPs, or sales scripts as plain text, then ask the AI assistant questions — it reads the playbook together with live pipeline data and activity history to suggest exactly what to say to a given client, who to prioritise today, or where the pipeline is weak.'},
+    {t:'Activity Log',b:'A single reverse-chronological feed of every system event — applications, stage changes, record additions, calls, message sends, ticket resolutions, calendar appointments — across the entire portfolio and every department. Click any client name to jump to their record.'},
     {t:'Archive',b:'Every rejected or closed-out department record, plus every churned client, in one place. Nothing is ever deleted — restore any of them back into an active pipeline at any time.'},
-    {t:'+ Add Client',b:'The internal intake form for staff to add an already-signed or manually-sourced client directly, with full control over starting stage, tier, and notes — the same underlying record as the public Apply form, just entered from inside the Command Centre instead of the outward-facing site.'},
-    {t:'Pricing / Settings',b:'The four investment tiers (Foundation, Growth, Enterprise, Flagship Command System) with their one-time build value and monthly retainer, editable for new applications going forward. Also includes a full demo-data reset for a clean live pitch.'}
+    {t:'+ Add Client',b:'The internal intake form for staff to add an already-signed or manually-sourced client directly, with full control over starting stage, tier, and notes.'},
+    {t:'Pricing / Settings',b:'The four investment tiers with their one-time build value and monthly retainer, editable for new applications going forward. Also includes a full demo-data reset for a clean live pitch.'}
   ];
   const active=state.clients.filter(c=>c.stage==='Active'||c.stage==='Renewal Due');
   const mrr=active.reduce((s,c)=>s+c.monthly,0);
   const buildValue=active.reduce((s,c)=>s+c.contractValue,0);
   return `<div class="card"><div style="font-size:15px;font-weight:800;margin-bottom:16px">Operator Manual — read this before running a live demo or handing the system to staff</div>
 
-    <div class="docs-block"><h3>1. What this system is, in one sentence</h3><p>Every pillar of the business — bookings, stock, payroll, facilities, membership, brand, and executive reporting — lives in one dashboard instead of a dozen disconnected spreadsheets and apps, and every number on screen is computed live, not typed in by hand. Each department is a mini command centre in its own right: its own pipeline, its own message library, its own follow-up queue, its own call log, and its own archive.</p></div>
+    <div class="docs-block"><h3>1. What this system is, in one sentence</h3><p>Every pillar of the business — bookings, stock, payroll, facilities, membership, brand, and executive reporting — lives in one dashboard instead of a dozen disconnected spreadsheets and apps, and every number on screen is computed live, not typed in by hand. Each department is a mini command centre in its own right: its own pipeline, calendar, message library, follow-up queue, call log, and archive.</p></div>
 
     <div class="section-title" style="margin-top:20px">Tab-by-tab operating guide</div>
     ${docs.map(d=>`<div class="docs-block"><h3>${d.t}</h3><p>${d.b}</p></div>`).join('')}
 
-    <div class="docs-block"><h3>Data &amp; persistence</h3><p>Every action in this Command Centre — a new application, a stage change, a department record, a call, a message sent, a note — is written to persistent storage immediately and reloads on your next visit. This is a full working system, not a static mockup: nothing here needs a separate backend to function, though the companion Apps Script file can mirror the same data into a real Google Sheet if a client wants their data in spreadsheet form as well.</p></div>
+    <div class="docs-block"><h3>Data &amp; persistence</h3><p>Every action in this Command Centre — a new application, a stage change, a department record, a call, a message sent, a calendar appointment, a note — is written to persistent storage immediately and reloads on your next visit. This is a full working system, not a static mockup.</p></div>
 
     <div class="section-title" style="margin-top:24px">The ROI case (use this in live pitches)</div>
     <div class="docs-block"><p>Live portfolio right now: <b style="color:var(--gold)">${fmtMoney(mrr)}</b> MRR across ${active.length} active accounts, <b style="color:var(--gold)">${fmtMoney(buildValue)}</b> in cumulative build value. Industry data shows fragmented, manual operations typically leak 10–15% of monthly revenue through unrecorded sales, stock drift, and booking friction — on a GH₵300,000/month operation that is over GH₵45,000 lost every month. A Flagship build (GH₵250,000 + GH₵15,000/mo) recovers its own cost in roughly six months purely by sealing that leak; every month after that is added margin, not a sunk cost.</p></div>
 
-    <div class="section-title" style="margin-top:24px">Objection handling cheat-sheet</div>
-    <div class="docs-block">
-      <p><b style="color:var(--gold)">"We already use spreadsheets."</b> — Spreadsheets don't alert anyone, don't sync across locations or staff in real time, and break under concurrent edits. This replaces that layer entirely; existing spreadsheet data migrates in during onboarding.</p>
-      <p><b style="color:var(--gold)">"This is expensive."</b> — Price it against what leakage already costs monthly, not in isolation. Walk them through the ROI case above with their own estimated turnover.</p>
-      <p><b style="color:var(--gold)">"Will staff actually use it?"</b> — Every tier includes hands-on SOP training, and every department has its own Docs tab built into the product itself — staff are never handed a system without a written guide for running it.</p>
-      <p><b style="color:var(--gold)">"What happens after the sale?"</b> — The monthly retainer is 24/7 priority support, continuous optimisation, automatic daily backups, and a monthly operational audit — not passive maintenance.</p>
-    </div>
-
     <div class="section-title" style="margin-top:24px">Demo script — walking a prospect through this live</div>
-    <div class="docs-block"><p>1. Start on the public site — show the ROI section and pricing.<br>2. Submit a real application through Apply — point out it just became a live Prospect record.<br>3. Open the Command Centre → Pipeline and show the new card sitting there.<br>4. Open Departments → Facilities (or any pillar), add a real ticket, move it through Pipeline, log a Call, and show the Follow-Up queue with a ready-to-send message and WhatsApp button.<br>5. Reject a demo item live and show it land in that department's Archive, then restore it — proves nothing is ever lost.<br>6. Close on Revenue — show MRR, cumulative contract value, and the 45-day renewals view as what they'll be looking at as a live client.</p></div>
+    <div class="docs-block"><p>1. Start on the public site — show the ROI section and pricing.<br>2. Submit a real application through Apply — point out it just became a live Prospect record.<br>3. Open the Command Centre → Pipeline and show the new card sitting there.<br>4. Open Departments → any pillar, add a real ticket, move it through Pipeline, add a Calendar appointment, log a Call, and show the Follow-Up queue.<br>5. Open Calendar (global) — show the roll-up view.<br>6. Open Daily Outreach — log a WhatsApp send and a status view.<br>7. Open Summary — flip through Today / Month / 1 Year / All Time.<br>8. Open AI Assistant — paste a short playbook, ask "who should I contact first today?"<br>9. Close on Revenue — show MRR, cumulative contract value, and the 45-day renewals view as what they'll be looking at as a live client.</p></div>
   </div>`;
 }
 
@@ -1407,6 +1978,7 @@ function openClient(id){
   const tier=state.tiers.find(t=>t.key===c.tierKey)||state.tiers[0];
   const timeline=state.activity.filter(a=>a.clientId===id);
   const clientRecords=state.records.filter(r=>r.clientId===id);
+  const clientEvents=state.calendarEvents.filter(e=>e.clientId===id);
   document.getElementById('modalRoot').innerHTML=`
     <div class="overlay" onclick="if(event.target===this)closeClientModal()">
       <div class="modal">
@@ -1416,19 +1988,29 @@ function openClient(id){
         </div>
         <div class="detail-grid">
           <div><div class="k">Stage</div><select id="cd_stage" onchange="updateClient('${id}','stage',this.value)">${STAGES.map(s=>`<option ${s===c.stage?'selected':''}>${s}</option>`).join('')}</select></div>
+          <div><div class="k">WhatsApp label</div><select id="cd_walabel" onchange="updateClient('${id}','waLabel',this.value)">${SIGNALS.map(s=>`<option value="${s.key}" ${s.key===c.waLabel?'selected':''}>${s.icon} ${s.name}</option>`).join('')}</select></div>
           <div><div class="k">Tier</div><div class="v">${tier.name}</div></div>
           <div><div class="k">Monthly retainer</div><div class="v mono" style="color:var(--gold)">${fmtMoney(c.monthly)}</div></div>
           <div><div class="k">Contract value</div><div class="v mono">${fmtMoney(c.contractValue)}</div></div>
           <div><div class="k">Renewal date</div><div class="v">${fmtDate(c.renewal)}</div></div>
           <div><div class="k">Health score</div><div class="v mono">${c.health}</div></div>
           <div><div class="k">Contact</div><div class="v">${c.contactName||'—'} · ${c.contactNumber||'—'}</div></div>
-          <div><div class="k">Client since</div><div class="v">${fmtDate(c.created)}</div></div>
+          <div><div class="k">Date joined</div><input type="date" value="${(c.created||'').slice(0,10)}" onchange="updateClient('${id}','created',new Date(this.value).toISOString())"></div>
+          <div><div class="k">Last contact</div><input type="date" value="${c.lastContact||''}" onchange="updateClient('${id}','lastContact',this.value)"></div>
+          <div><div class="k">Next follow-up</div><input type="date" value="${c.nextFollowUp||''}" onchange="updateClient('${id}','nextFollowUp',this.value)"></div>
+          <div><div class="k">Messages sent</div><div class="v mono" style="color:var(--teal)">${c.messageCount||0} ${(!c.firstConversationAt&&(c.messageCount||0)>0)?'<span style="color:var(--red)">— no reply yet</span>':''}</div></div>
+        </div>
+        <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap">
+          <button class="btn btn-ghost btn-sm" onclick="logClientMessageSent('${id}',false)">+ Log message sent</button>
+          <button class="btn btn-green btn-sm" onclick="logClientMessageSent('${id}',true)">+ Log message — got a reply (marks conversation started)</button>
         </div>
         <div class="k">Active modules</div>
         <div class="module-check-row">${MODULES.map(m=>`<label class="module-check"><input type="checkbox" ${c.modules.includes(m.id)?'checked':''} onchange="toggleClientModule('${id}','${m.id}',this.checked)"> ${m.icon} ${m.title}</label>`).join('')}</div>
         <div class="k" style="margin-top:12px">Notes</div>
         <textarea id="cd_notes" rows="2">${c.notes||''}</textarea>
         <button class="btn btn-ghost btn-sm" style="margin-top:6px" onclick="saveClientNote('${id}')">Save note</button>
+        <div class="section-title">Upcoming appointments (${clientEvents.length})</div>
+        ${clientEvents.slice(0,6).map(e=>`<div style="font-size:11px;color:var(--text-dim);padding:5px 0;border-bottom:1px solid #1c1a16">🗓 ${e.title} — ${fmtDate(e.date)} ${e.time||''}</div>`).join('')||'<div style="font-size:11px;color:var(--muted)">None scheduled.</div>'}
         <div class="section-title">Records tied to this client (${clientRecords.length})</div>
         ${clientRecords.slice(0,8).map(r=>`<div style="font-size:11px;color:var(--text-dim);padding:5px 0;border-bottom:1px solid #1c1a16;cursor:pointer" onclick="closeClientModal();openRecordModal('${r.id}')">${MODULES.find(m=>m.id===r.module).icon} ${r.title} — <span class="pill" style="background:${STAGE_COLOR2[r.stage]}22;color:${STAGE_COLOR2[r.stage]}">${r.stage}</span></div>`).join('')||'<div style="font-size:11px;color:var(--muted)">None yet.</div>'}
         <div class="section-title">Activity timeline</div>
@@ -1445,6 +2027,21 @@ async function updateClient(id,field,value){
   await saveClients();
   addActivity(id,c.name,field+' changed from "'+old+'" to "'+value+'"');
   showToast('Updated');
+  renderDashboard();
+  if(document.getElementById('modalRoot').innerHTML)openClient(id);
+}
+async function logClientMessageSent(id,gotReply){
+  const c=state.clients.find(x=>x.id===id);
+  if(!c)return;
+  c.messageCount=(c.messageCount||0)+1;
+  c.lastContact=todayStr();
+  if(gotReply && !c.firstConversationAt){ c.firstConversationAt=c.messageCount; }
+  await saveClients();
+  state.dailyOutreach.unshift({id:uid('OUT'),type:'WhatsApp',note:(gotReply?'Reply received — ':'Message sent — ')+c.name,ts:Date.now(),clientId:id});
+  await saveOutreach();
+  addActivity(id,c.name,gotReply?('Got first reply after '+c.messageCount+' messages — conversation started'):'Message logged as sent (#'+c.messageCount+')');
+  showToast(gotReply?'Conversation started!':'Message logged');
+  openClient(id);
   renderDashboard();
 }
 async function toggleClientModule(id,moduleId,checked){
