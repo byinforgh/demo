@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>VenueFlow – QR Ordering, Rewards & Live Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;800&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f4f3ff;--card:#ffffffcc;--ink:#14123a;--mute:#6b6a8f;--line:#e2e0f7;--a:#6d4aff;--b:#00c2d4;--c:#ff5c8a;--ok:#13b981;--warn:#f59e0b;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0d0b25;--card:#1a1740cc;--ink:#f2f1ff;--mute:#a09fc8;--line:#2c2860}}
+:root[data-theme="dark"]{--bg:#0d0b25;--card:#1a1740cc;--ink:#f2f1ff;--mute:#a09fc8;--line:#2c2860}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;font-family:Sora,system-ui,sans-serif;color:var(--ink);background:var(--bg);min-height:100vh;
+background-image:radial-gradient(60vw 40vw at 90% -10%,#6d4aff44,transparent),radial-gradient(50vw 40vw at -10% 10%,#00c2d433,transparent),radial-gradient(40vw 30vw at 60% 110%,#ff5c8a33,transparent);background-attachment:fixed}
+header{position:sticky;top:env(safe-area-inset-top,0px);z-index:9;display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;padding:12px 20px;background:var(--card);backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
+.logo{font-weight:800;font-size:18px;display:flex;align-items:center;gap:10px}
+.logo i{width:34px;height:34px;border-radius:11px;background:linear-gradient(135deg,var(--a),var(--b) 60%,var(--c));display:grid;place-items:center;color:#fff;font-style:normal}
+.logo input{font:inherit;border:0;background:transparent;color:var(--ink);width:170px;border-bottom:1px dashed var(--line)}
+nav{display:flex;gap:6px;background:var(--line);padding:4px;border-radius:999px}
+nav button,.tabs button{border:0;background:transparent;color:var(--mute);font:600 13px Sora;padding:9px 16px;border-radius:999px;cursor:pointer}
+nav button.on,.tabs button.on{background:linear-gradient(135deg,var(--a),#8f6bff);color:#fff;box-shadow:0 6px 18px #6d4aff55}
+main{max-width:1180px;margin:0 auto;padding:22px 18px 90px}
+.hint{font-size:12px;color:var(--mute);background:var(--card);border:1px dashed var(--a);border-radius:14px;padding:10px 14px;margin-bottom:16px}
+.hint b{color:var(--a)}
+.card{background:var(--card);backdrop-filter:blur(12px);border:1px solid var(--line);border-radius:22px;padding:18px;box-shadow:0 10px 34px #6d4aff14}
+h2{margin:0 0 12px;font-size:20px}h3{margin:0 0 10px;font-size:14px;letter-spacing:.08em;text-transform:uppercase;color:var(--mute)}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+.chip{border:1px solid var(--line);background:var(--card);color:var(--ink);font:600 12px Sora;padding:8px 14px;border-radius:999px;cursor:pointer}
+.chip.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px}
+.item{border:1px solid var(--line);background:var(--card);border-radius:18px;padding:14px;cursor:pointer;position:relative;transition:.15s}
+.item:hover{transform:translateY(-3px);border-color:var(--a);box-shadow:0 12px 26px #6d4aff30}
+.item .e{font-size:28px}.item b{display:block;margin:6px 0 2px;font-size:14px}.item small{color:var(--mute)}.item .p{font:500 13px 'JetBrains Mono';color:var(--a);margin-top:6px}
+.badge{position:absolute;top:10px;right:10px;background:var(--c);color:#fff;border-radius:999px;font-size:11px;padding:2px 8px;font-weight:800}
+.bar{position:fixed;left:0;right:0;bottom:0;padding:12px 20px calc(12px + env(safe-area-inset-bottom,0px));background:var(--card);backdrop-filter:blur(14px);border-top:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;z-index:8}
+.btn{border:0;font:700 13px Sora;padding:12px 20px;border-radius:14px;cursor:pointer;color:#fff;background:linear-gradient(135deg,var(--a),var(--c))}
+.btn.alt{background:var(--line);color:var(--ink)}.btn.ok{background:linear-gradient(135deg,var(--ok),var(--b))}.btn.no{background:transparent;color:var(--c);border:1px solid var(--c)}
+.btn.sm{padding:8px 12px;font-size:12px}
+input,select{font:500 14px Sora;padding:11px 12px;border:1px solid var(--line);border-radius:12px;background:var(--card);color:var(--ink);width:100%;margin:4px 0 10px}
+.modal{position:fixed;inset:0;background:#0009;display:none;place-items:center;z-index:20;padding:16px}.modal.on{display:grid}
+.modal .card{max-width:440px;width:100%;background:var(--bg);max-height:90vh;overflow:auto}
+.row{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:6px 0}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px;margin-bottom:16px}
+.kpi{border-radius:22px;padding:18px;color:#fff;position:relative;overflow:hidden}
+.kpi:nth-child(1){background:linear-gradient(135deg,#6d4aff,#9b7bff)}.kpi:nth-child(2){background:linear-gradient(135deg,#00c2d4,#3a8bff)}.kpi:nth-child(3){background:linear-gradient(135deg,#ff5c8a,#ff8a5c)}.kpi:nth-child(4){background:linear-gradient(135deg,#13b981,#00c2d4)}
+.kpi small{opacity:.85;text-transform:uppercase;letter-spacing:.08em;font-size:11px}.kpi div{font-size:30px;font-weight:800;margin-top:4px}
+.cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px}
+.ord{border:1px solid var(--line);border-left:5px solid var(--warn);border-radius:16px;padding:14px;margin-bottom:12px;background:var(--card)}
+.ord.PREPARING{border-left-color:var(--b)}.ord.DELIVERED{border-left-color:var(--a)}.ord.PAID{border-left-color:var(--ok)}
+.st{font-size:10px;font-weight:800;padding:3px 9px;border-radius:999px;background:#f59e0b33;color:var(--warn)}
+.PREPARING .st{background:#00c2d433;color:var(--b)}.DELIVERED .st{background:#6d4aff33;color:var(--a)}.PAID .st{background:#13b98133;color:var(--ok)}
+.combo{font-size:11px;background:#ff5c8a22;color:var(--c);padding:4px 8px;border-radius:8px;margin:6px 0;display:inline-block}
+table{width:100%;border-collapse:collapse;font-size:13px}th{text-align:left;color:var(--mute);font-size:11px;text-transform:uppercase;padding:8px 6px}td{padding:10px 6px;border-top:1px solid var(--line)}
+.bars{display:flex;align-items:flex-end;gap:8px;height:170px;padding-top:10px}.bars div{flex:1;border-radius:10px 10px 4px 4px;background:linear-gradient(180deg,var(--a),var(--b));position:relative;min-height:6px}
+.bars span{position:absolute;bottom:-20px;left:0;right:0;text-align:center;font-size:10px;color:var(--mute)}
+.pts{font:800 54px Sora;background:linear-gradient(135deg,var(--a),var(--c));-webkit-background-clip:text;background-clip:text;color:transparent}
+.pg{height:10px;background:var(--line);border-radius:99px;overflow:hidden}.pg i{display:block;height:100%;background:linear-gradient(90deg,var(--b),var(--a),var(--c))}
+.tabs{display:flex;gap:6px;margin-bottom:16px;flex-wrap:wrap}.tabs button{background:var(--card);border:1px solid var(--line)}
+.lock{font-size:11px;color:var(--c);font-weight:700}
+.view{display:none}.view.on{display:block}
+.toast{position:fixed;top:80px;right:20px;background:var(--ink);color:var(--bg);padding:12px 18px;border-radius:14px;z-index:30;font-size:13px;display:none}
+@media(max-width:640px){nav button{padding:8px 10px;font-size:12px}.logo input{width:120px}}
+</style></head><body>
+<header>
+<div class="logo"><i>✦</i><input id="brand" value="The White House" aria-label="Venue name"><span style="color:var(--mute);font-weight:600;font-size:12px">powered by VenueFlow</span></div>
+<nav><button data-v="guest" class="on">① Guest QR Order</button><button data-v="rewards">② Rewards</button><button data-v="dash">③ Staff & Manager</button></nav>
+</header>
+<div class="toast" id="toast"></div>
+<main>
+<section id="guest" class="view on">
+<div class="hint"><b>Demo step 1:</b> This is what a guest sees after scanning the QR code on their table. Pick a location, add food <i>and</i> drinks, then submit. Then jump to ③ to watch it arrive live.</div>
+<div class="card"><h3>Where are you sitting?</h3><div class="chips" id="locs"></div>
+<h3>Menu</h3><div class="chips" id="cats"></div><div class="grid" id="menu"></div></div>
+<div class="bar"><div><b id="cn">0 items</b> · <span id="ct" style="font-family:'JetBrains Mono'">GHS 0.00</span></div><button class="btn" onclick="openCart()">View order →</button></div>
+</section>
+
+<section id="rewards" class="view">
+<div class="hint"><b>Demo step 2:</b> Every guest becomes a free member automatically. Points grow with every order (1 pt per GHS 10). Redemption needs a staff member – ask for it, then approve it in ③.</div>
+<div class="cols"><div class="card"><h3>Member profile</h3><div id="prof"></div></div>
+<div class="card"><h3>Rewards</h3><div id="rw"></div></div></div>
+</section>
+
+<section id="dash" class="view">
+<div class="hint"><b>Demo step 3:</b> Staff dashboard (live queues) and manager view (revenue, staff, stock). Choose a staff member on each order, then Start → Delivered → Confirm payment. Points land on the guest's profile.</div>
+<div class="tabs" id="dt"><button data-d="live" class="on">⚡ Live orders</button><button data-d="mgr">📈 Revenue <span class="lock">🔒 manager</span></button><button data-d="staff">👥 Staff</button><button data-d="stock">📦 Stock</button></div>
+<div id="d-live"></div><div id="d-mgr" style="display:none"></div><div id="d-staff" style="display:none"></div><div id="d-stock" style="display:none"></div>
+</section>
+</main>
+
+<div class="modal" id="cm"><div class="card">
+<h2>Your order</h2><div id="cl"></div>
+<div class="row"><b>Total</b><b id="cm-t" style="font-family:'JetBrains Mono'"></b></div>
+<select id="pay"><option>Cash on delivery</option><option>MoMo</option></select>
+<input id="ph" placeholder="Phone or Member ID (try THWGH1)" oninput="lookup()"><div id="wb" style="font-size:12px;color:var(--ok);margin:-6px 0 8px"></div>
+<input id="nm" placeholder="Your name">
+<div class="row"><button class="btn alt" onclick="cm.classList.remove('on')">Keep browsing</button><button class="btn" onclick="submitOrder()">Submit order</button></div>
+</div></div>
+
+<script>
+const $=s=>document.querySelector(s);
+const MENU=[
+["Water","🚰",5,"Drinks","bar"],["Coke Can","🥤",20,"Drinks","bar"],["Malt","🍺",25,"Drinks","bar"],["Club Beer","🍻",25,"Beer","bar"],["Guinness","🍺",30,"Beer","bar"],["Red Bull","⚡",40,"Drinks","bar"],
+["Mojito Classic","🍹",65,"Cocktails","bar"],["Pina Colada","🍍",65,"Cocktails","bar"],["Virgin Colada","🥥",50,"Cocktails","bar"],["Long Island","🍸",160,"Cocktails","bar"],
+["Chicken Pizza M","🍕",150,"Pizza","food"],["Veg Pizza L","🍕",200,"Pizza","food"],["Jollof + Wings","🍛",100,"Rice","food"],["Loaded Fries","🍟",130,"Fries","food"],["Banku & Tilapia","🐟",130,"Swallow","food"],["Chicken Wings","🍗",120,"Bites","food"]];
+const LOCS=["Table 4","Pool","VIP Area","Terrace","Room 12","Bar Area – T3","Pickup"];
+const REW=[["Free Drink",30],["Free Food Item",40],["Free Entry",50],["20% Off Bill",80],["VIP Access Pass",150]];
+const STAFF=["AAK – Akua","PG – Priscilla","DAN – Daniel","NSB – Bernice"];
+let S={cart:{},loc:LOCS[0],cat:"All",orders:[],reqs:[],id:1,
+ me:{id:"THWGH1",name:"Ama",phone:"0201234567",pts:41,visits:12},
+ members:{"THWGH1":{id:"THWGH1",name:"Ama",phone:"0201234567",pts:41,visits:12}},
+ rev:5095,orders_n:48,hours:[["10",180],["12",520],["14",760],["16",640],["18",980],["20",1420],["22",1100]],
+ staff:{"AAK – Akua":[14,1720],"PG – Priscilla":[11,1340],"DAN – Daniel":[13,1530],"NSB – Bernice":[10,505]},
+ sold:{"Water":21,"Veg Pizza L":7,"Club Beer":6,"Jollof + Wings":5,"Mojito Classic":5},
+ stock:[["Club Beer",95,24],["Coke Can",14,20],["Malt",60,20],["Red Bull",9,12],["Guinness",40,12],["Water",100,30]]};
+const m=n=>"GHS "+n.toFixed(2);
+function toast(t){const e=$("#toast");e.textContent=t;e.style.display="block";setTimeout(()=>e.style.display="none",2200)}
+document.querySelectorAll("nav button").forEach(b=>b.onclick=()=>{document.querySelectorAll("nav button").forEach(x=>x.classList.toggle("on",x==b));document.querySelectorAll(".view").forEach(v=>v.classList.toggle("on",v.id==b.dataset.v));draw()});
+document.querySelectorAll("#dt button").forEach(b=>b.onclick=()=>{document.querySelectorAll("#dt button").forEach(x=>x.classList.toggle("on",x==b));["live","mgr","staff","stock"].forEach(k=>$("#d-"+k).style.display=k==b.dataset.d?"block":"none");draw()});
+$("#brand").oninput=()=>{document.title=$("#brand").value+" – VenueFlow"};
+function chips(){ $("#locs").innerHTML=LOCS.map(l=>`<button class="chip ${l==S.loc?"on":""}" onclick="S.loc='${l}';chips()">${l}</button>`).join("");
+ const cats=["All",...new Set(MENU.map(x=>x[3]))];$("#cats").innerHTML=cats.map(c=>`<button class="chip ${c==S.cat?"on":""}" onclick="S.cat='${c}';chips()">${c}</button>`).join("");
+ $("#menu").innerHTML=MENU.filter(x=>S.cat=="All"||x[3]==S.cat).map(x=>`<div class="item" onclick="add('${x[0]}')">${S.cart[x[0]]?`<span class="badge">${S.cart[x[0]]}</span>`:""}<div class="e">${x[1]}</div><b>${x[0]}</b><small>${x[3]} · ${x[4]=="bar"?"Bar":"Kitchen"}</small><div class="p">${m(x[2])}</div></div>`).join("");cart()}
+const price=n=>MENU.find(x=>x[0]==n)[2];
+function add(n,d=1){S.cart[n]=(S.cart[n]||0)+d;if(S.cart[n]<=0)delete S.cart[n];chips();if(cm.classList.contains("on"))openCart()}
+function cart(){let q=0,t=0;for(const n in S.cart){q+=S.cart[n];t+=S.cart[n]*price(n)}$("#cn").textContent=q+" item"+(q==1?"":"s");$("#ct").textContent=m(t);return t}
+const cm=$("#cm");
+function openCart(){if(!Object.keys(S.cart).length)return toast("Add something first");
+ $("#cl").innerHTML=Object.keys(S.cart).map(n=>`<div class="row"><span>${n}</span><span><button class="btn alt sm" onclick="add('${n}',-1)">−</button> ${S.cart[n]} <button class="btn alt sm" onclick="add('${n}',1)">+</button></span></div>`).join("");
+ $("#cm-t").textContent=m(cart());if(!$("#ph").value){$("#ph").value="THWGH1";lookup()}cm.classList.add("on")}
+function lookup(){const v=$("#ph").value.trim().toUpperCase();const f=Object.values(S.members).find(x=>x.id==v||x.phone==v);
+ if(f){$("#wb").textContent=`Welcome back, ${f.name} · ${f.id} · ${f.pts} pts`;$("#nm").value=f.name}else $("#wb").textContent=v?"New here? We'll create your free member ID automatically.":""}
+function submitOrder(){const ph=$("#ph").value.trim(),nm=$("#nm").value.trim();if(!ph||!nm)return toast("Name and phone/ID are required");
+ let f=Object.values(S.members).find(x=>x.id==ph.toUpperCase()||x.phone==ph);
+ if(!f){const id="THWGH"+(Object.keys(S.members).length+1);f=S.members[id]={id,name:nm,phone:ph,pts:0,visits:0}}
+ S.me=f;const bar={},food={};for(const n in S.cart){(MENU.find(x=>x[0]==n)[4]=="bar"?bar:food)[n]=S.cart[n]}
+ const mk=(items,type,pair)=>({id:"#"+(1000+S.id++),type,items,loc:S.loc,total:Object.keys(items).reduce((a,n)=>a+items[n]*price(n),0),pay:$("#pay").value,who:f.name,mid:f.id,st:"PLACED",staff:"",pair});
+ const b=Object.keys(bar).length?mk(bar,"bar"):null,k=Object.keys(food).length?mk(food,"food"):null;
+ if(b&&k){b.pair=k;k.pair=b}[b,k].forEach(o=>o&&S.orders.push(o));S.cart={};cm.classList.remove("on");chips();
+ toast("Order sent ✓ "+(b&&k?"Split automatically: bar + kitchen":"")+" – open ③ to see it live");draw()}
+function advance(id){const o=S.orders.find(x=>x.id==id);const sel=$("#s"+id.slice(1));o.staff=sel.value;if(!o.staff)return toast("Pick the staff member first (required)");
+ const nx={PLACED:"PREPARING",PREPARING:"DELIVERED",DELIVERED:"PAID"};o.st=nx[o.st];
+ if(o.st=="PAID"){S.rev+=o.total;S.orders_n++;S.hours[S.hours.length-1][1]+=o.total;const s=S.staff[o.staff];s[0]++;s[1]+=o.total;const mem=S.members[o.mid];mem.pts+=Math.floor(o.total/10);mem.visits++;
+ for(const n in o.items)S.sold[n]=(S.sold[n]||0)+o.items[n];toast(`Paid ✓ ${mem.name} earned ${Math.floor(o.total/10)} points`)}draw()}
+function cancel(id){S.orders.find(x=>x.id==id).st="CANCELLED";draw()}
+function card(o){const lab={PLACED:"Start preparing",PREPARING:"Mark delivered",DELIVERED:"Confirm "+(o.pay=="MoMo"?"MoMo":"cash")+" received"}[o.st];
+ return `<div class="ord ${o.st}"><div class="row"><b>${o.loc} <small style="color:var(--mute)">${o.id}</small></b><span class="st">${o.st}</span></div>
+ <div style="font-size:13px">${Object.keys(o.items).map(n=>o.items[n]+" × "+n).join(", ")}</div><small style="color:var(--mute)">${o.who} · ${o.mid} · ${o.pay}</small>
+ ${o.pair?`<div class="combo">🥂 ${o.type=="food"?"Drinks":"Food"} also ordered – ${o.pair.st}</div>`:""}
+ <div class="row"><b style="font-family:'JetBrains Mono';color:var(--a)">${m(o.total)}</b></div>
+ ${o.st=="PAID"?"<small>Handled by "+o.staff+"</small>":`<select id="s${o.id.slice(1)}"><option value="">Staff handling this order (required)…</option>${STAFF.map(s=>`<option ${s==o.staff?"selected":""}>${s}</option>`).join("")}</select>
+ <div class="row"><button class="btn ok" style="flex:1" onclick="advance('${o.id}')">${lab}</button><button class="btn no" onclick="cancel('${o.id}')">Cancel</button></div>`}</div>`}
+function draw(){
+ const act=S.orders.filter(o=>["PLACED","PREPARING","DELIVERED"].includes(o.st));
+ const q=t=>(act.filter(o=>o.type==t).map(card).join("")||`<small style="color:var(--mute)">No active orders. Place one from ①.</small>`);
+ $("#d-live").innerHTML=`<div class="kpis"><div class="kpi"><small>Active orders</small><div>${act.length}</div></div><div class="kpi"><small>Orders today</small><div>${S.orders_n}</div></div><div class="kpi"><small>Low stock</small><div>${S.stock.filter(s=>s[1]<=s[2]).length}</div></div><div class="kpi"><small>Members online</small><div>${Object.keys(S.members).length}</div></div></div>
+ <div class="cols"><div class="card"><h3>🍸 Bar queue</h3>${q("bar")}</div><div class="card"><h3>🍕 Kitchen queue</h3>${q("food")}</div>
+ <div class="card"><h3>🎁 Reward redemption requests</h3>${S.reqs.filter(r=>!r.done).map((r,i)=>`<div class="row"><span>${r.name} – ${r.r[0]}</span><button class="btn ok sm" onclick="approve(${S.reqs.indexOf(r)})">Approve</button></div>`).join("")||"<small style='color:var(--mute)'>None pending. Guests request from ②.</small>"}</div></div>`;
+ const mx=Math.max(...S.hours.map(h=>h[1]));
+ const top=Object.entries(S.sold).sort((a,b)=>b[1]-a[1]).slice(0,5);
+ $("#d-mgr").innerHTML=`<div class="kpis"><div class="kpi"><small>Revenue today</small><div>${m(S.rev)}</div></div><div class="kpi"><small>Orders</small><div>${S.orders_n}</div></div><div class="kpi"><small>Avg. order value</small><div>${m(S.rev/S.orders_n)}</div></div><div class="kpi"><small>Members</small><div>${Object.keys(S.members).length+24}</div></div></div>
+ <div class="cols"><div class="card"><h3>Revenue by hour</h3><div class="bars">${S.hours.map(h=>`<div style="height:${h[1]/mx*100}%"><span>${h[0]}h</span></div>`).join("")}</div><div style="height:20px"></div></div>
+ <div class="card"><h3>Top sellers</h3>${top.map(t=>`<div class="row"><span>${t[0]}</span><b>${t[1]} sold</b></div>`).join("")}</div>
+ <div class="card"><h3>Bar vs kitchen split</h3><div class="pg"><i style="width:58%"></i></div><div class="row"><small>Bar 58%</small><small>Kitchen 42%</small></div><p style="font-size:12px;color:var(--mute)">Managers see sales, stock and who served what – without interrupting the team.</p></div></div>`;
+ $("#d-staff").innerHTML=`<div class="card"><h3>Staff performance (today)</h3><table><tr><th>Staff</th><th>Orders</th><th>Sales</th><th>Status</th></tr>${Object.entries(S.staff).map(([k,v])=>`<tr><td><b>${k}</b></td><td>${v[0]}</td><td>${m(v[1])}</td><td><span class="st" style="background:#13b98133;color:var(--ok)">ON DUTY</span></td></tr>`).join("")}</table><p style="font-size:12px;color:var(--mute)">Every order is tagged to the staff member who handled it – accountability and fair incentives built in.</p></div>`;
+ $("#d-stock").innerHTML=`<div class="card"><h3>Stock levels</h3><table><tr><th>Item</th><th>Qty</th><th>Par</th><th></th></tr>${S.stock.map(s=>`<tr><td>${s[0]}</td><td>${s[1]}</td><td>${s[2]}</td><td>${s[1]<=s[2]?'<span class="st" style="background:#ff5c8a33;color:var(--c)">LOW – RESTOCK</span>':'<span class="st" style="background:#13b98133;color:var(--ok)">OK</span>'}</td></tr>`).join("")}</table></div>`;
+ const f=S.me,nx=REW.find(r=>r[1]>f.pts)||REW[4];
+ $("#prof").innerHTML=`<div style="color:var(--mute)">${f.id} · ${f.visits} visits</div><div style="font-weight:800;font-size:22px">${f.name}</div><div class="pts">${f.pts}<span style="font-size:18px"> pts</span></div><div class="pg"><i style="width:${Math.min(100,f.pts/nx[1]*100)}%"></i></div><small style="color:var(--mute)">${Math.max(0,nx[1]-f.pts)} pts to ${nx[0]}</small><p style="font-size:12px;color:var(--mute)">Private to the venue – never sold or shared.</p>`;
+ $("#rw").innerHTML=REW.map(r=>`<div class="row"><span>${f.pts>=r[1]?"✅":"🔒"} ${r[0]}</span><span><b style="font-family:'JetBrains Mono'">${r[1]} pts</b> <button class="btn sm ${f.pts>=r[1]?"":"alt"}" onclick="req('${r[0]}',${r[1]})">Ask staff</button></span></div>`).join("")+`<small style="color:var(--mute)">Guests can't redeem alone – a staff member approves it in ③.</small>`;
+ chips2()}
+function chips2(){}
+function req(n,p){if(S.me.pts<p)return toast("Not enough points yet – order more!");S.reqs.push({name:S.me.name,mid:S.me.id,r:[n,p]});toast("Request sent to staff – approve it in ③");draw()}
+function approve(i){const r=S.reqs[i];S.members[r.mid].pts-=r.r[1];r.done=true;toast("Redeemed ✓ "+r.r[0]);draw()}
+chips();draw();
+</script></body></html>
